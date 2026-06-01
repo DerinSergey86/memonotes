@@ -32,8 +32,20 @@ const [error, setError] = useState<string | null>(null);
 
 useEffect(() => {
   fetch('/api/notes')
-    .then(res => res.json())
-    .then(data => setNotes(data))
+    .then(res => {
+      if (!res.ok) {
+        if (res.status === 401) {
+          // Пользователь не авторизован – можно показать сообщение или редирект
+          setError('Необходимо войти в систему');
+        } else {
+          throw new Error('Ошибка сервера');
+        }
+        setNotes([]); // очищаем заметки
+        return;
+      }
+      return res.json();
+    })
+    .then(data => setNotes(data || []))
     .catch(() => setError('Не удалось загрузить заметки'))
     .finally(() => setLoading(false));
 }, []);
@@ -169,7 +181,40 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     boxSizing: 'border-box',
       padding: '0' }}>
         <div style={{ padding: '0 20px' }}>
-      <h1 style={{ textAlign: 'center', margin: '20px 0',fontSize: '36px', lineHeight: '30px',  }}>MemoNotes 📝</h1>
+ <div style={{
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: '10px'
+}}>
+  {/* Заголовок по центру */}
+  <div style={{ flex: 1, textAlign: 'center' }}>
+    <h1 style={{
+      margin: 0,
+      fontSize: '36px',
+      lineHeight: 1.2,        // равномерные отступы сверху и снизу
+      display: 'inline-block' // чтобы сам текст был центрирован
+    }}>
+      MemoNotes 📝
+    </h1>
+  </div>
+  {/* Кнопка справа */}
+  <div style={{ flexShrink: 0, marginLeft: 'auto', paddingRight: '20px' }}>
+    <a href="/login" style={{
+      textDecoration: 'none',
+      background: '#859c5e',
+      color: 'white',
+      padding: '6px 14px',
+      borderRadius: '20px',
+      fontSize: '14px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      whiteSpace: 'nowrap',
+      display: 'inline-block',
+      lineHeight: 1.2    // чтобы текст внутри кнопки не растягивал
+    }}>
+      Войти
+    </a>
+  </div>
+</div>
       {activeTags.length > 0 && (
   <div style={{ margin: '10px 0', padding: '8px', background: '#f0f0f0', borderRadius: '4px',textAlign: 'center', display: 'flex', justifyContent: 'center', flexWrap: 'wrap'  }}>
     <strong>Фильтр:</strong>
