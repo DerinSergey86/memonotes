@@ -8,6 +8,7 @@ import AddNoteForm from '@/components/AddNoteForm';
 import EditGroupModal from '@/components/EditGroupModal';
 import { useMounted } from '@/hooks/useMounted';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 
 
@@ -31,13 +32,14 @@ const [notes, setNotes] = useState<Note[]>([]);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState<string | null>(null);
 const router = useRouter();
+const { data: session } = useSession();
 
 useEffect(() => {
   fetch('/api/notes')
     .then(res => {
       if (!res.ok) {
         if (res.status === 401) {
-          router.push('/login'); // перенаправляем на вход
+          router.push('/login');
         } else {
           setError('Не удалось загрузить заметки');
         }
@@ -49,7 +51,7 @@ useEffect(() => {
     .then(data => setNotes(data || []))
     .catch(() => setError('Не удалось загрузить заметки'))
     .finally(() => setLoading(false));
-}, []);
+}, [router]);
 
 
 const [searchQuery, setSearchQuery] = useState('');
@@ -205,22 +207,35 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     top: '50%',
     transform: 'translateY(-50%)'
   }}>
-    <a href="/login" style={{
+   {session ? (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <span style={{ fontSize: '14px' }}>{session.user?.email}</span>
+    <a href="/api/auth/signout" style={{
       textDecoration: 'none',
-      background: '#859c5e',
-      color: 'white',
-      padding: '8px 16px',
+      background: '#ccc',
+      color: '#333',
+      padding: '6px 14px',
       borderRadius: '20px',
       fontSize: '14px',
-      lineHeight: '20px',   // внутренняя высота кнопки
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       whiteSpace: 'nowrap',
-      display: 'inline-block',
-      boxSizing: 'border-box'
     }}>
-      Войти
+      Выйти
     </a>
   </div>
+) : (
+  <a href="/login" style={{
+    textDecoration: 'none',
+    background: '#859c5e',
+    color: 'white',
+    padding: '8px 16px',
+    borderRadius: '20px',
+    fontSize: '14px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    whiteSpace: 'nowrap',
+  }}>
+    Войти
+  </a>
+)}
 </div>
       {activeTags.length > 0 && (
   <div style={{ margin: '10px 0', padding: '8px', background: '#f0f0f0', borderRadius: '4px',textAlign: 'center', display: 'flex', justifyContent: 'center', flexWrap: 'wrap'  }}>
@@ -364,6 +379,5 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     )}
     </div>
   </div>
-);
-}
+
 export default App
