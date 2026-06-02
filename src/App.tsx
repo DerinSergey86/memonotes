@@ -223,6 +223,7 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
   cursor: 'pointer',
 }}>
   Выйти
+  
 </button>
                 </div>
               ) : (
