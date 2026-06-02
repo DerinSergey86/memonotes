@@ -8,7 +8,7 @@ import AddNoteForm from '@/components/AddNoteForm';
 import EditGroupModal from '@/components/EditGroupModal';
 import { useMounted } from '@/hooks/useMounted';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 
 
 
@@ -184,59 +184,63 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     boxSizing: 'border-box',
       padding: '0' }}>
         <div style={{ padding: '0 20px' }}>
- <div style={{
-  display: 'flex',
-  alignItems: 'center',
-  marginBottom: '10px',
-  position: 'relative'
+          {/* Шапка с заголовком и кнопкой */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '10px',
+            position: 'relative'
+          }}>
+            <div style={{ flex: 1, textAlign: 'center' }}>
+              <h1 style={{
+                margin: 0,
+                fontSize: '36px',
+                lineHeight: '48px',
+                padding: '0',
+                whiteSpace: 'nowrap'
+              }}>
+                MemoNotes 📝
+              </h1>
+            </div>
+            <div style={{
+              position: 'absolute',
+              right: '20px',
+              top: '50%',
+              transform: 'translateY(-50%)'
+            }}>
+              {session ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px' }}>{session.user?.email}</span>
+                  <button onClick={() => signOut()} style={{
+  textDecoration: 'none',
+  background: '#ccc',
+  color: '#333',
+  padding: '6px 14px',
+  borderRadius: '20px',
+  fontSize: '14px',
+  whiteSpace: 'nowrap',
+  border: 'none',
+  cursor: 'pointer',
 }}>
-  <div style={{ flex: 1, textAlign: 'center' }}>
-    <h1 style={{
-      margin: 0,
-      fontSize: '36px',
-      lineHeight: '48px',   // высота строки 48px
-      padding: '0',
-      whiteSpace: 'nowrap'
-    }}>
-      MemoNotes 📝
-    </h1>
-  </div>
-  <div style={{
-    position: 'absolute',
-    right: '20px',
-    top: '50%',
-    transform: 'translateY(-50%)'
-  }}>
-   {session ? (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-    <span style={{ fontSize: '14px' }}>{session.user?.email}</span>
-    <a href="/api/auth/signout" style={{
-      textDecoration: 'none',
-      background: '#ccc',
-      color: '#333',
-      padding: '6px 14px',
-      borderRadius: '20px',
-      fontSize: '14px',
-      whiteSpace: 'nowrap',
-    }}>
-      Выйти
-    </a>
-  </div>
-) : (
-  <a href="/login" style={{
-    textDecoration: 'none',
-    background: '#859c5e',
-    color: 'white',
-    padding: '8px 16px',
-    borderRadius: '20px',
-    fontSize: '14px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    whiteSpace: 'nowrap',
-  }}>
-    Войти
-  </a>
-)}
-</div>
+  Выйти
+</button>
+                </div>
+              ) : (
+                <a href="/login" style={{
+                  textDecoration: 'none',
+                  background: '#859c5e',
+                  color: 'white',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: '14px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  whiteSpace: 'nowrap',
+                }}>
+                  Войти
+                </a>
+              )}
+            </div>
+          </div>
       {activeTags.length > 0 && (
   <div style={{ margin: '10px 0', padding: '8px', background: '#f0f0f0', borderRadius: '4px',textAlign: 'center', display: 'flex', justifyContent: 'center', flexWrap: 'wrap'  }}>
     <strong>Фильтр:</strong>
@@ -379,5 +383,6 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     )}
     </div>
   </div>
-
+);
+}
 export default App
