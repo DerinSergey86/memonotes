@@ -6,6 +6,6 @@ export default defineConfig({
     path: './prisma/migrations',
   },
   datasource: {
-    url: 'file:./dev.db', // ← без вложенного db, просто url
+    url: process.env.TURSO_DATABASE_URL!,
   },
 });

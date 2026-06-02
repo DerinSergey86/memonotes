@@ -5,8 +5,10 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Передаём только URL, адаптер сам создаст клиента
-const adapter = new PrismaLibSql({ url: 'file:./dev.db' });
+const adapter = new PrismaLibSql({
+  url: process.env.TURSO_DATABASE_URL!,
+  authToken: process.env.TURSO_AUTH_TOKEN!,
+});
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
