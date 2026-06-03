@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { type Note } from '@/types';
 
+
+
 interface NoteCardProps {
   note: Note;
   onDelete: (id: string) => void;
@@ -14,6 +16,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick }: NoteCardProps) {
   const [editContent, setEditContent] = useState(note.content);
   const [editTags, setEditTags] = useState(note.tags.join(', ')); // массив в строку
 
+  
   // Вход в режим редактирования: сбрасываем поля на текущие значения заметки
   const handleStartEditing = () => {
     setEditTitle(note.title);
@@ -31,15 +34,15 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick }: NoteCardProps) {
   const handleSave = () => {
     if (!editTitle.trim() || !editContent.trim() || !editTags.trim()) return;
 
-    const updatedNote: Note = {
-      ...note,                         // сохраняем id и createdAt
-      title: editTitle.trim(),
-      content: editContent.trim(),
-      tags: editTags
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag !== ''),
-    };
+    
+
+  const updatedNote: Note = {
+  ...note,
+  title: editTitle.trim(),
+  content: editContent.trim(),
+  tags: editTags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
+  type: note.type,  
+};
 
     onUpdate(updatedNote);
     setIsEditing(false);
@@ -80,6 +83,9 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick }: NoteCardProps) {
 ))}
         </div>
         <small>Создано: {new Date(note.createdAt).toLocaleString()}</small>
+        <div style={{ marginBottom: '8px' }}>
+  {note.type === 'task' ? '📌 Дело' : '📝 Знание'}
+</div>
         <div style={{ marginTop: '8px' }}>
           <button onClick={handleStartEditing} style={{ marginRight: '8px', padding: '4px 8px' }}>
             Редактировать

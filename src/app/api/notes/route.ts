@@ -33,7 +33,12 @@ export async function POST(request: Request) {
       title: body.title,
       content: body.content,
       tags: JSON.stringify(body.tags),
-      userId: session.user.id, // привязываем к вошедшему пользователю
+      type: body.type || 'note',          // по умолчанию "note"
+      userId: session.user.id,
+      dueDate: body.dueDate || null,
+      latitude: body.latitude || null,
+      longitude: body.longitude || null,
+      location: body.location || null,
     },
   });
 

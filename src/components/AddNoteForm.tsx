@@ -11,6 +11,7 @@ function AddNoteForm({ onAdd, allTags }: AddNoteFormProps) {
   const [content, setContent] = useState('');
   const [tagsArray, setTagsArray] = useState<string[]>([]);
   const [inputTag, setInputTag] = useState('');
+  const [noteType, setNoteType] = useState<'note' | 'task'>('note');
 
   const handleAddTag = () => {
     const trimmed = inputTag.trim().toLowerCase();
@@ -32,14 +33,16 @@ function AddNoteForm({ onAdd, allTags }: AddNoteFormProps) {
       id: crypto.randomUUID(),
       title: title.trim(),
       content: content.trim(),
-      tags: tagsArray, // уже в нижнем регистре
+      tags: tagsArray,
+      type: noteType,              
       createdAt: new Date().toISOString(),
     };
 
-    onAdd(newNote);
+   onAdd(newNote);
     setTitle('');
     setContent('');
     setTagsArray([]);
+    setNoteType('note');               
   };
 
   const handleClear = () => {
@@ -114,6 +117,26 @@ function AddNoteForm({ onAdd, allTags }: AddNoteFormProps) {
           </datalist>
           <button type="button" onClick={handleAddTag } style={{ padding: '4px 8px' }}>Добавить</button>
         </div>
+      </div>
+      <div style={{ marginBottom: '8px' }}>
+        <label style={{ marginRight: '10px' }}>
+          <input
+            type="radio"
+            value="note"
+            checked={noteType === 'note'}
+            onChange={() => setNoteType('note')}
+          />
+          Знание
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="task"
+            checked={noteType === 'task'}
+            onChange={() => setNoteType('task')}
+          />
+          Дело
+        </label>
       </div>
 <div style={{ textAlign: 'center', marginTop: '8px' }}>
       <button type="submit" style={{ padding: '4px 8px' }}>Добавить заметку</button>

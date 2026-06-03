@@ -10,10 +10,19 @@ model Note {
   id        String   @id @default(uuid())
   title     String
   content   String
-  tags      String
+  tags      String   // JSON-строка с массивом тегов
+  type      String   @default("note") // "note" или "task"
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
   userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  // Поля для задач (опциональные)
+  dueDate   DateTime? // срок выполнения
+  completed Boolean   @default(false)
+  latitude  Float?    // координаты
+  longitude Float?
+  location  String?   // человекочитаемый адрес
 }
 
 model User {

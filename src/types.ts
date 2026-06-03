@@ -2,8 +2,15 @@ export interface Note {
   id: string;
   title: string;
   content: string;
-  tags: string[];       // массив строк, например ["работа", "важное"]
-  createdAt: string;    // дата в формате ISO, например "2026-05-14T12:00:00Z"
+  tags: string[];
+  type: 'note' | 'task';         // ← новое
+  createdAt: string;
+  updatedAt?: string;             // ← опционально
+  dueDate?: string | null;        // ← опционально
+  completed?: boolean;            // ← опционально
+  latitude?: number | null;
+  longitude?: number | null;
+  location?: string | null;
 }
 
 export interface Group {
