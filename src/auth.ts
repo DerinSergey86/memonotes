@@ -27,6 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   session: { strategy: "jwt" },
+  secret: "my-super-secret-key-1234567890",
   pages: {
     signIn: '/login',
   },
