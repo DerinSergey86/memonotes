@@ -22,7 +22,23 @@ function GroupList({ groups, onGroupClick, onEditGroup }: GroupListProps) {
 
   return (
     <div>
-      <h2 style={{ textAlign: 'center' }}>Группы</h2>
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
+    <h2 style={{ margin: 0 }}>Группы</h2>
+    <a href="/addresses" style={{
+      textDecoration: 'none',
+      background: '#859c5e',
+      color: 'white',
+      padding: '4px 12px',
+      borderRadius: '20px',
+      fontSize: '14px',
+      marginLeft: '15px',
+      whiteSpace: 'nowrap',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    }}>
+      Мои адреса
+    </a>
+  </div>
+  <div className="group-container" style={{ display: 'flex', alignItems: 'center' }}>
       <div className="group-container" style={{ display: 'flex', alignItems: 'center' }}>
         <button className="scroll-button" onClick={() => scroll('left')}>❮</button>
         <div
@@ -54,7 +70,7 @@ function GroupList({ groups, onGroupClick, onEditGroup }: GroupListProps) {
         <button className="scroll-button" onClick={() => scroll('right')}>❯</button>
       </div>
     </div>
-  );
-}
+    </div>
+  )};
 
 export default GroupList;

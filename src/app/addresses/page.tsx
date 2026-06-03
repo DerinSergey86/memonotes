@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { type LocationTag } from '@/types';
 
 export default function AddressesPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [tags, setTags] = useState<LocationTag[]>([]);
   const [name, setName] = useState('');
@@ -24,6 +24,7 @@ export default function AddressesPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
+         // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchTags();
     } else if (status === 'unauthenticated') {
       router.push('/login');
