@@ -6,28 +6,40 @@ datasource db {
   provider = "sqlite"
 }
 
-model Note {
-  id        String   @id @default(uuid())
-  title     String
-  content   String
-  tags      String   // JSON-строка с массивом тегов
-  type      String   @default("note") // "note" или "task"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-
-  // Поля для задач (опциональные)
-  dueDate   DateTime? // срок выполнения
-  completed Boolean   @default(false)
-  latitude  Float?    // координаты
-  longitude Float?
-  location  String?   // человекочитаемый адрес
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  notes        Note[]
+  locationTags LocationTag[] // новая связь
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String   // пока храним пароль в открытом виде (небезопасно), позже добавим хеширование
+model Note {
+  id            String       @id @default(uuid())
+  title         String
+  content       String
+  tags          String
+  type          String       @default("note")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  dueDate       DateTime?
+  completed     Boolean      @default(false)
+  latitude      Float?
+  longitude     Float?
+  location      String?
+  locationTag   LocationTag? @relation(fields: [locationTagId], references: [id])
+  locationTagId String?
+}
+
+model LocationTag {
+  id        String  @id @default(uuid())
+  name      String
+  address   String
+  latitude  Float?
+  longitude Float?
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
   notes     Note[]
 }

@@ -11,6 +11,8 @@ export interface Note {
   latitude?: number | null;
   longitude?: number | null;
   location?: string | null;
+  locationTagId?: string | null;
+  locationTag?: LocationTag | null;
 }
 
 export interface Group {
@@ -18,4 +20,12 @@ export interface Group {
   name: string;        
   image: string;       
   tags: string[];      
+}
+
+export interface LocationTag {
+  id: string;
+  name: string;
+  address: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
