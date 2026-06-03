@@ -22,41 +22,42 @@ function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddres
     });
   };
 
-  return (
+    return (
     <div>
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-    <h2 style={{ margin: 0 }}>Группы</h2>
-    <button onClick={onAddGroup} style={{
-  background: 'transparent',
-  border: 'none',
-  fontSize: '24px',
-  cursor: 'pointer',
-  marginLeft: '15px',
-  lineHeight: 1,
-}}>
-  ＋
-</button>
-   <button onClick={onShowAddresses} style={{
-  textDecoration: 'none',
-  background: '#f0f0f0',
-  color: '#333',
-  padding: '4px 12px',
-  borderRadius: '20px',
-  fontSize: '14px',
-  marginLeft: '15px',
-  whiteSpace: 'nowrap',
-  border: '1px solid #ccc',
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '4px',
-  cursor: 'pointer',
-  boxShadow: 'none',
-  transition: 'background 0.2s',
-}}>
-  🗺️ Мои адреса
-</button>
-  </div>
-  <div className="group-container" style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
+        <h2 style={{ margin: 0 }}>Группы</h2>
+        <button onClick={onAddGroup} style={{
+          background: 'transparent',
+          border: 'none',
+          fontSize: '24px',
+          cursor: 'pointer',
+          marginLeft: '15px',
+          lineHeight: 1,
+        }}>
+          ＋
+        </button>
+        <button onClick={onShowAddresses} style={{
+          textDecoration: 'none',
+          background: '#f0f0f0',
+          color: '#333',
+          padding: '4px 12px',
+          borderRadius: '20px',
+          fontSize: '14px',
+          marginLeft: '15px',
+          whiteSpace: 'nowrap',
+          border: '1px solid #ccc',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          cursor: 'pointer',
+          boxShadow: 'none',
+          transition: 'background 0.2s',
+        }}>
+          🗺️ Мои адреса
+        </button>
+      </div>
+
+      {/* Основной контейнер для карусели */}
       <div className="group-container" style={{ display: 'flex', alignItems: 'center' }}>
         <button className="scroll-button" onClick={() => scroll('left')}>❮</button>
         <div
@@ -72,7 +73,7 @@ function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddres
             padding: '10px 0',
             cursor: 'grab',
             userSelect: 'none',
-            flex: 1,
+            flex: 1,  // ← вот это ограничивает ширину и включает скролл
           }}
         >
           {groups.map((group) => (
@@ -88,7 +89,6 @@ function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddres
         <button className="scroll-button" onClick={() => scroll('right')}>❯</button>
       </div>
     </div>
-    </div>
-  )};
-
+  );
+};
 export default GroupList;
