@@ -44,6 +44,39 @@ export async function POST(request: Request) {
   return NextResponse.json(tag, { status: 201 });
 }
 
+// PUT /api/location-tags
+export async function PUT(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { id, name, address, latitude, longitude } = body;
+
+  if (!id || !name || !address) {
+    return NextResponse.json({ error: 'ID, название и адрес обязательны' }, { status: 400 });
+  }
+
+  // Проверяем владельца
+  const existing = await prisma.locationTag.findUnique({ where: { id } });
+  if (!existing || existing.userId !== session.user.id) {
+    return NextResponse.json({ error: 'Метка не найдена или доступ запрещён' }, { status: 404 });
+  }
+
+  const updated = await prisma.locationTag.update({
+    where: { id },
+    data: {
+      name,
+      address,
+      latitude: latitude ?? existing.latitude,
+      longitude: longitude ?? existing.longitude,
+    },
+  });
+
+  return NextResponse.json(updated);
+}
+
 // DELETE /api/location-tags
 export async function DELETE(request: Request) {
   const session = await auth();
@@ -56,7 +89,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'ID метки обязателен' }, { status: 400 });
   }
 
-  // Проверяем, что метка принадлежит пользователю
   const tag = await prisma.locationTag.findUnique({ where: { id } });
   if (!tag || tag.userId !== session.user.id) {
     return NextResponse.json({ error: 'Метка не найдена или доступ запрещён' }, { status: 404 });
