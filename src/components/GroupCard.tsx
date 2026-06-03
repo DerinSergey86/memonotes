@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { type Group } from '@/types';
 
 interface GroupCardProps {
@@ -57,6 +58,7 @@ function GroupCard({ group, onClick, onEdit, isDragging }: GroupCardProps) {
       >
         ✎
       </button>
+
 
       <img
         src={group.image}

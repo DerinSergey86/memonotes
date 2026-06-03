@@ -6,9 +6,11 @@ interface GroupListProps {
   groups: Group[];
   onGroupClick: (group: Group) => void;
   onEditGroup: (group: Group) => void;
+  onAddGroup: () => void;
+  onShowAddresses: () => void;
 }
 
-function GroupList({ groups, onGroupClick, onEditGroup }: GroupListProps) {
+function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddresses }: GroupListProps) {
   const { ref, isDragging, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
   const scroll = (direction: 'left' | 'right') => {
@@ -24,19 +26,35 @@ function GroupList({ groups, onGroupClick, onEditGroup }: GroupListProps) {
     <div>
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
     <h2 style={{ margin: 0 }}>Группы</h2>
-    <a href="/addresses" style={{
-      textDecoration: 'none',
-      background: '#859c5e',
-      color: 'white',
-      padding: '4px 12px',
-      borderRadius: '20px',
-      fontSize: '14px',
-      marginLeft: '15px',
-      whiteSpace: 'nowrap',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    }}>
-      Мои адреса
-    </a>
+    <button onClick={onAddGroup} style={{
+  background: 'transparent',
+  border: 'none',
+  fontSize: '24px',
+  cursor: 'pointer',
+  marginLeft: '15px',
+  lineHeight: 1,
+}}>
+  ＋
+</button>
+   <button onClick={onShowAddresses} style={{
+  textDecoration: 'none',
+  background: '#f0f0f0',
+  color: '#333',
+  padding: '4px 12px',
+  borderRadius: '20px',
+  fontSize: '14px',
+  marginLeft: '15px',
+  whiteSpace: 'nowrap',
+  border: '1px solid #ccc',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '4px',
+  cursor: 'pointer',
+  boxShadow: 'none',
+  transition: 'background 0.2s',
+}}>
+  🗺️ Мои адреса
+</button>
   </div>
   <div className="group-container" style={{ display: 'flex', alignItems: 'center' }}>
       <div className="group-container" style={{ display: 'flex', alignItems: 'center' }}>
