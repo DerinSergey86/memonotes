@@ -293,10 +293,19 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
   </div>
 )}
 <hr style={{ marginLeft: '-20px', marginRight: '-20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
+
 {mounted && (
       <GroupList groups={groups} onGroupClick={handleGroupClick} onEditGroup={handleEditGroup}/> 
       )} 
       <div style={{ textAlign: 'center', margin: '10px 0',  }}>
+        <a href="/addresses" style={{ textDecoration: 'none',
+                  background: '#859c5e',
+                  color: 'white',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: '14px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  whiteSpace: 'nowrap', }}>Мои адреса</a>
       <button onClick={() => setIsFormOpen(prev => !prev)} style={{ padding: '6px 12px' }}>
         {isFormOpen ? '▲ Свернуть форму' : '▼ Добавить заметку'}
       </button>
@@ -307,6 +316,7 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
   transition: 'max-height 0.3s ease, opacity 0.3s ease',
   opacity: isFormOpen ? 1 : 0,
 }}>
+  
   <AddNoteForm onAdd={handleAddNote} allTags={allTags} />
 </div>
       <hr style={{ marginLeft: '-20px', marginRight: '-20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
