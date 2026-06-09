@@ -77,10 +77,19 @@ const allTags = useMemo(() => {
   return Array.from(tagSet).sort(); // отсортированы по алфавиту
 }, [notes, groups]);
 
-  const handleGroupClick = (group: Group) => {
+const handleGroupClick = (group: Group) => {
   setActiveTags(prevTags => {
-    const newTags = group.tags.filter(tag => !prevTags.includes(tag));
-    return [...prevTags, ...newTags];
+    // Проверяем, все ли теги группы уже активны
+    const allActive = group.tags.every(tag => prevTags.includes(tag));
+    
+    if (allActive) {
+      // Убираем все теги этой группы
+      return prevTags.filter(tag => !group.tags.includes(tag));
+    } else {
+      // Добавляем те теги, которых ещё нет
+      const newTags = group.tags.filter(tag => !prevTags.includes(tag));
+      return [...prevTags, ...newTags];
+    }
   });
 };
 

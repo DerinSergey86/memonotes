@@ -16,7 +16,7 @@ function GroupCard({ group, onClick, onEdit, isDragging, isActive }: GroupCardPr
     }
   };
 
-  return (
+ return (
     <div
       onClick={handleClick}
       style={{
@@ -28,12 +28,16 @@ function GroupCard({ group, onClick, onEdit, isDragging, isActive }: GroupCardPr
         flexShrink: 0,
         textAlign: 'center',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        transition: 'transform 0.2s',
+        transition: 'transform 0.2s, border-color 0.2s',
         position: 'relative',
-        borderColor: isActive ? '#26c000' : '#ccc',
+        transform: isActive ? 'scale(1.08)' : 'scale(1)',  // начальный масштаб
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+      onMouseEnter={(e) => {
+        if (!isActive) e.currentTarget.style.transform = 'scale(1.05)';
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) e.currentTarget.style.transform = 'scale(1)';
+      }}
     >
       {/* Кнопка редактирования */}
       <button
