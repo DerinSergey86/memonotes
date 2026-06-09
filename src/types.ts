@@ -28,4 +28,5 @@ export interface LocationTag {
   address: string;
   latitude?: number | null;
   longitude?: number | null;
+  radius?: number | null;
 }

@@ -6,9 +6,10 @@ interface GroupCardProps {
   onClick: (group: Group) => void;
   onEdit: (group: Group) => void;
   isDragging: boolean;
+  isActive: boolean;
 }
 
-function GroupCard({ group, onClick, onEdit, isDragging }: GroupCardProps) {
+function GroupCard({ group, onClick, onEdit, isDragging, isActive }: GroupCardProps) {
   const handleClick = () => {
     if (!isDragging) {
       onClick(group);
@@ -20,7 +21,7 @@ function GroupCard({ group, onClick, onEdit, isDragging }: GroupCardProps) {
       onClick={handleClick}
       style={{
         cursor: 'pointer',
-        border: '1px solid #ccc',
+        border: `2px solid ${isActive ? '#859c5e' : '#ccc'}`,
         borderRadius: '8px',
         overflow: 'hidden',
         width: '120px',
@@ -28,7 +29,8 @@ function GroupCard({ group, onClick, onEdit, isDragging }: GroupCardProps) {
         textAlign: 'center',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         transition: 'transform 0.2s',
-        position: 'relative', // нужно для абсолютного позиционирования кнопки
+        position: 'relative',
+        borderColor: isActive ? '#26c000' : '#ccc',
       }}
       onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
       onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}

@@ -42,4 +42,5 @@ model LocationTag {
   userId    String
   user      User    @relation(fields: [userId], references: [id])
   notes     Note[]
+  radius Float? @default(50)
 }

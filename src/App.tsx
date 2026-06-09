@@ -37,6 +37,7 @@ const { data: session } = useSession();
 const [showAddresses, setShowAddresses] = useState(false);
 const [locationTags, setLocationTags] = useState<LocationTag[]>([]);
 
+
 useEffect(() => {
   if (showAddresses) {
     fetch('/api/location-tags')
@@ -198,7 +199,9 @@ const handleUpdateNote = async (updatedNote: Note) => {
 
 const [activeTags, setActiveTags] = useState<string[]>([]);
 
-const [strictFilter, setStrictFilter] = useState(false)
+const [strictFilter, setStrictFilter] = useState(false);
+
+const [noteTypeFilter, setNoteTypeFilter] = useState<'all' | 'note' | 'task'>('all');
 
 const filteredNotes = (() => {
   let result = activeTags.length === 0
@@ -217,6 +220,10 @@ const filteredNotes = (() => {
       note.tags.some(tag => tag.includes(query))
     );
   }
+
+  if (noteTypeFilter !== 'all') {
+  result = result.filter(note => note.type === noteTypeFilter);
+}
 
   return result;
 })();
@@ -363,12 +370,13 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
   />
 ) : (
   <GroupList 
-    groups={groups} 
-    onGroupClick={handleGroupClick} 
-    onEditGroup={handleEditGroup} 
-    onAddGroup={handleAddGroup} 
-    onShowAddresses={() => setShowAddresses(true)} 
-  />
+              groups={groups}
+              onGroupClick={handleGroupClick}
+              onEditGroup={handleEditGroup}
+              onAddGroup={handleAddGroup}
+              onShowAddresses={() => setShowAddresses(true)}
+              activeTags={activeTags}
+                />
 ))}
       <div style={{ textAlign: 'center', margin: '10px 0',  }}>
       <button onClick={() => setIsFormOpen(prev => !prev)} style={{ padding: '6px 12px' }}>
@@ -385,8 +393,43 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
   <AddNoteForm onAdd={handleAddNote} allTags={allTags} />
 </div>
       <hr style={{ marginLeft: '-20px', marginRight: '-20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', margin: '16px 0' }}>
-  <h2 style={{ margin: 0 }}>Заметки</h2>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
+  {/* Сегментированный переключатель */}
+  <div style={{
+    display: 'inline-flex',
+    borderRadius: '20px',
+    overflow: 'hidden',
+    border: '1px solid #859c5e',
+  }}>
+    <button
+      onClick={() => setNoteTypeFilter(noteTypeFilter === 'note' ? 'all' : 'note')}
+      style={{
+        padding: '4px 12px',
+        border: 'none',
+        background: noteTypeFilter === 'note' ? '#859c5e' : 'transparent',
+        color: noteTypeFilter === 'note' ? 'white' : '#859c5e',
+        cursor: 'pointer',
+        fontSize: '14px',
+        transition: 'all 0.2s',
+      }}
+    >
+      📝 Знания
+    </button>
+    <button
+      onClick={() => setNoteTypeFilter(noteTypeFilter === 'task' ? 'all' : 'task')}
+      style={{
+        padding: '4px 12px',
+        border: 'none',
+        background: noteTypeFilter === 'task' ? '#859c5e' : 'transparent',
+        color: noteTypeFilter === 'task' ? 'white' : '#859c5e',
+        cursor: 'pointer',
+        fontSize: '14px',
+        transition: 'all 0.2s',
+      }}
+    >
+      📌 Дела
+    </button>
+  </div>
   {!isSearchOpen ? (
     <button
       onClick={() => setIsSearchOpen(true)}

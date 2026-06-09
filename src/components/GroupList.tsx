@@ -8,9 +8,10 @@ interface GroupListProps {
   onEditGroup: (group: Group) => void;
   onAddGroup: () => void;
   onShowAddresses: () => void;
+  activeTags: string[];
 }
 
-function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddresses }: GroupListProps) {
+function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddresses, activeTags }: GroupListProps) {
   const { ref, isDragging, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
   const scroll = (direction: 'left' | 'right') => {
@@ -83,6 +84,7 @@ function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddres
               onClick={onGroupClick}
               onEdit={onEditGroup}
               isDragging={isDragging}
+              isActive={activeTags.some(tag => group.tags.includes(tag))}
             />
           ))}
         </div>
