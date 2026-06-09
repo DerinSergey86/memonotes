@@ -11,6 +11,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { type Group, type Note, type LocationTag } from '@/types';
 import AddressList from '@/components/AddressList';
 import AddressFormModal from '@/components/AddressFormModal'
+import { useGeofencing } from '@/hooks/useGeofencing';
 
 
 
@@ -38,6 +39,14 @@ const { data: session } = useSession();
 const [showAddresses, setShowAddresses] = useState(false);
 const [locationTags, setLocationTags] = useState<LocationTag[]>([]);
 const [editingAddress, setEditingAddress] = useState<LocationTag | null | undefined>(undefined);
+const [geoEnabled, setGeoEnabled] = useState(false);
+
+
+const { startWatching, stopWatching } = useGeofencing({
+  locationTags,
+  notes,
+  enabled: geoEnabled,
+});
 
 
 useEffect(() => {
@@ -326,6 +335,7 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
                 </a>
               )}
             </div>
+
           </div>
       {activeTags.length > 0 && (
   <div style={{ margin: '10px 0', padding: '8px', background: '#f0f0f0', borderRadius: '4px',textAlign: 'center', display: 'flex', justifyContent: 'center', flexWrap: 'wrap'  }}>
@@ -388,14 +398,43 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     onBack={() => setShowAddresses(false)} 
   />
 ) : (
-  <GroupList 
-              groups={groups}
-              onGroupClick={handleGroupClick}
-              onEditGroup={handleEditGroup}
-              onAddGroup={handleAddGroup}
-              onShowAddresses={() => setShowAddresses(true)}
-              activeTags={activeTags}
-                />
+  <>
+    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+      <button onClick={() => {
+        if (!geoEnabled) {
+          Notification.requestPermission().then(perm => {
+            if (perm === 'granted') {
+              setGeoEnabled(true);
+              startWatching();
+            } else {
+              alert('Разрешите уведомления, чтобы геозоны работали');
+            }
+          });
+        } else {
+          setGeoEnabled(false);
+          stopWatching();
+        }
+      }} style={{
+        padding: '6px 14px',
+        borderRadius: '20px',
+        fontSize: '14px',
+        border: 'none',
+        cursor: 'pointer',
+        background: geoEnabled ? '#f0f0f0' : '#859c5e',
+        color: geoEnabled ? '#333' : 'white',
+      }}>
+        {geoEnabled ? '🛑 Остановить геозоны' : '📍 Включить геозоны'}
+      </button>
+    </div>
+    <GroupList 
+      groups={groups}
+      onGroupClick={handleGroupClick}
+      onEditGroup={handleEditGroup}
+      onAddGroup={handleAddGroup}
+      onShowAddresses={() => setShowAddresses(true)}
+      activeTags={activeTags}
+    />
+  </>
 ))}
       <div style={{ textAlign: 'center', margin: '10px 0',  }}>
       <button onClick={() => setIsFormOpen(prev => !prev)} style={{ padding: '6px 12px' }}>
