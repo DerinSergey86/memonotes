@@ -19,13 +19,16 @@ export async function GET() {
 
 // POST /api/location-tags
 export async function POST(request: Request) {
+  console.log('POST /api/location-tags called');
   const session = await auth();
+  console.log('session:', session?.user?.id);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
   }
 
   const body = await request.json();
-  const { name, address, latitude, longitude } = body;
+  console.log('body:', body);
+  const { name, address, latitude, longitude, radius } = body;
 
   if (!name || !address) {
     return NextResponse.json({ error: 'Название и адрес обязательны' }, { status: 400 });
@@ -37,6 +40,7 @@ export async function POST(request: Request) {
       address,
       latitude: latitude || null,
       longitude: longitude || null,
+      radius: Number(radius) || 50,
       userId: session.user.id,
     },
   });
@@ -52,13 +56,12 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const { id, name, address, latitude, longitude } = body;
+  const { id, name, address, latitude, longitude, radius } = body;
 
   if (!id || !name || !address) {
     return NextResponse.json({ error: 'ID, название и адрес обязательны' }, { status: 400 });
   }
 
-  // Проверяем владельца
   const existing = await prisma.locationTag.findUnique({ where: { id } });
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: 'Метка не найдена или доступ запрещён' }, { status: 404 });
@@ -71,6 +74,7 @@ export async function PUT(request: Request) {
       address,
       latitude: latitude ?? existing.latitude,
       longitude: longitude ?? existing.longitude,
+      radius: radius !== undefined ? Number(radius) : existing.radius,
     },
   });
 

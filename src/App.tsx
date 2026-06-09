@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { type Group, type Note, type LocationTag } from '@/types';
 import AddressList from '@/components/AddressList';
+import AddressFormModal from '@/components/AddressFormModal'
 
 
 
@@ -36,6 +37,7 @@ const router = useRouter();
 const { data: session } = useSession();
 const [showAddresses, setShowAddresses] = useState(false);
 const [locationTags, setLocationTags] = useState<LocationTag[]>([]);
+const [editingAddress, setEditingAddress] = useState<LocationTag | null | undefined>(undefined);
 
 
 useEffect(() => {
@@ -124,11 +126,6 @@ const handleCloseModal = () => {
   setEditingGroup(null);
 };
 
-const handleEditAddress = (tag: LocationTag) => {
-  // Пока заглушка, позже сделаем модалку
-  alert(`Редактирование: ${tag.name}`);
-};
-
 const handleDeleteAddress = async (id: string) => {
   try {
     const res = await fetch('/api/location-tags', {
@@ -143,18 +140,31 @@ const handleDeleteAddress = async (id: string) => {
   }
 };
 
-const handleAddAddress = () => {
-  const name = prompt('Название метки (например, Работа)');
-  const address = prompt('Адрес');
-  if (name && address) {
-    fetch('/api/location-tags', {
-      method: 'POST',
+const handleOpenAddressForm = () => setEditingAddress(null); // null означает создание нового
+const handleEditAddress = (tag: LocationTag) => setEditingAddress(tag);
+
+const handleSaveAddress = async (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null }) => {
+  const url = editingAddress ? `/api/location-tags` : '/api/location-tags';
+  const method = editingAddress ? 'PUT' : 'POST';
+  const body = editingAddress ? { id: editingAddress.id, ...data } : data;
+
+  try {
+    const res = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, address }),
-    })
-      .then(res => res.json())
-      .then(newTag => setLocationTags(prev => [...prev, newTag]))
-      .catch(() => setError('Не удалось добавить метку'));
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error('Ошибка сохранения');
+    // Обновить список меток
+    const updatedTags = await res.json();
+    if (editingAddress) {
+      setLocationTags(prev => prev.map(t => t.id === updatedTags.id ? updatedTags : t));
+    } else {
+      setLocationTags(prev => [...prev, updatedTags]);
+    }
+    setEditingAddress(undefined);
+  } catch {
+    setError('Не удалось сохранить адрес');
   }
 };
 
@@ -374,7 +384,7 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     tags={locationTags} 
     onEdit={handleEditAddress} 
     onDelete={handleDeleteAddress} 
-    onAdd={handleAddAddress} 
+    onAdd={handleOpenAddressForm} 
     onBack={() => setShowAddresses(false)} 
   />
 ) : (
@@ -509,6 +519,13 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
         onClose={handleCloseModal}
       />
     )}
+    {editingAddress !== undefined && (
+  <AddressFormModal
+    initial={editingAddress}
+    onSave={handleSaveAddress}
+    onClose={() => setEditingAddress(undefined)}
+  />
+)}
     </div>
   </div>
 );
