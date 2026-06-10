@@ -29,11 +29,11 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
 
  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim() || tagsArray.length === 0) return;
+    if (!content.trim()) return;
 
     const newNote: Note = {
       id: crypto.randomUUID(),
-      title: title.trim(),
+      title: title.trim() || content.trim().slice(0, 50),
       content: content.trim(),
       tags: tagsArray,
       type: noteType,              

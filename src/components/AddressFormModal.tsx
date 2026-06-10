@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { type LocationTag } from '@/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import LocationPickerMap from './LocationPickerMap';
 
 interface AddressFormModalProps {
   onSave: (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null }) => void;
@@ -87,21 +86,21 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
 </button>
             <div style={{ marginBottom: '12px' }}>
   <label>Выберите точку на карте:</label>
-  <LocationPickerMap
-    latitude={latitude}
-    longitude={longitude}
-    onLocationChange={(lat, lng) => {
-      setLatitude(lat);
-      setLongitude(lng);
-      setLocalError('');
-    }}
-  />
+  </div>
   {latitude && longitude && (
-    <p style={{ fontSize: '12px', color: 'green' }}>
+  <div style={{ marginBottom: '12px' }}>
+    <iframe
+      src={`https://yandex.ru/map-widget/v1/?ll=${longitude}%2C${latitude}&z=16&pt=${longitude},${latitude},pm2rdl`}
+      width="100%"
+      height="200"
+      style={{ border: 0, borderRadius: '8px' }}
+      allowFullScreen
+    />
+    <p style={{ fontSize: '12px', color: 'green', marginTop: '4px' }}>
       ✅ Координаты: {latitude.toFixed(6)}, {longitude.toFixed(6)}
     </p>
-  )}
-</div>
+  </div>
+)}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
             <button type="button" onClick={onClose}>Отмена</button>
             <button type="submit">Сохранить</button>
