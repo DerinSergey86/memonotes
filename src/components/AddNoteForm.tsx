@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { type Note } from '../types';
+import { type Note, type LocationTag } from '@/types';
 
 interface AddNoteFormProps {
   onAdd: (note: Note) => void;
   allTags: string[];
+  locationTags: LocationTag[];  
 }
 
-function AddNoteForm({ onAdd, allTags }: AddNoteFormProps) {
+function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tagsArray, setTagsArray] = useState<string[]>([]);
   const [inputTag, setInputTag] = useState('');
   const [noteType, setNoteType] = useState<'note' | 'task'>('note');
+  const [selectedLocationTagId, setSelectedLocationTagId] = useState<string>('');
 
   const handleAddTag = () => {
     const trimmed = inputTag.trim().toLowerCase();
@@ -36,6 +38,7 @@ function AddNoteForm({ onAdd, allTags }: AddNoteFormProps) {
       tags: tagsArray,
       type: noteType,              
       createdAt: new Date().toISOString(),
+      locationTagId: noteType === 'task' ? selectedLocationTagId || null : null,
     };
 
    onAdd(newNote);
@@ -53,6 +56,7 @@ function AddNoteForm({ onAdd, allTags }: AddNoteFormProps) {
   };
 
   return (
+    
     <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
       <input type="submit" style={{ display: 'none' }} />
       <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
@@ -138,6 +142,22 @@ function AddNoteForm({ onAdd, allTags }: AddNoteFormProps) {
           Дело
         </label>
       </div>
+      {noteType === 'task' && (
+  <div style={{ marginBottom: '8px' }}>
+    <select
+      value={selectedLocationTagId}
+      onChange={(e) => setSelectedLocationTagId(e.target.value)}
+      style={{ width: '100%', padding: '6px' }}
+    >
+      <option value="">Без геометки</option>
+      {locationTags.map(tag => (
+        <option key={tag.id} value={tag.id}>
+          {tag.name} — {tag.address}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
 <div style={{ textAlign: 'center', marginTop: '8px' }}>
       <button type="submit" style={{ padding: '4px 8px' }}>Добавить заметку</button>
     </div>

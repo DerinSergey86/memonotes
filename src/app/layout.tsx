@@ -1,5 +1,6 @@
 import '@/app/globals.css';
 import { SessionProvider } from 'next-auth/react';
+import 'leaflet/dist/leaflet.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

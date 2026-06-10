@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type Note } from '@/types';
+import { type Note, type LocationTag } from '@/types';
 
 
 
@@ -8,13 +8,15 @@ interface NoteCardProps {
   onDelete: (id: string) => void;
   onUpdate: (updatedNote: Note) => void;
   onTagClick: (tag: string) => void;
+  locationTags: LocationTag[];
 }
 
-function NoteCard({ note, onDelete, onUpdate, onTagClick }: NoteCardProps) {
+function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(note.title);
   const [editContent, setEditContent] = useState(note.content);
-  const [editTags, setEditTags] = useState(note.tags.join(', ')); // массив в строку
+  const [editTags, setEditTags] = useState(note.tags.join(', '));
+const [editLocationTagId, setEditLocationTagId] = useState(note.locationTagId || '');
 
   
   // Вход в режим редактирования: сбрасываем поля на текущие значения заметки
@@ -42,6 +44,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick }: NoteCardProps) {
   content: editContent.trim(),
   tags: editTags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
   type: note.type,  
+  locationTagId: note.type === 'task' ? editLocationTagId || null : null,
 };
 
     onUpdate(updatedNote);
@@ -86,6 +89,14 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick }: NoteCardProps) {
         <div style={{ marginBottom: '8px' }}>
   {note.type === 'task' ? '📌 Дело' : '📝 Знание'}
 </div>
+{note.type === 'task' && locationTags && (
+  <div style={{ fontSize: '14px', color: '#666' }}>
+    {(() => {
+      const tag = locationTags.find(lt => lt.id === note.locationTagId);
+      return tag ? `📍 ${tag.name}` : null;
+    })()}
+  </div>
+)}
         <div style={{ marginTop: '8px' }}>
           <button onClick={handleStartEditing} style={{ marginRight: '8px', padding: '4px 8px' }}>
             Редактировать
@@ -131,6 +142,22 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick }: NoteCardProps) {
         style={{ width: '100%', marginBottom: '8px' }}
         placeholder="Теги через запятую"
       />
+      {note.type === 'task' && (
+  <div style={{ marginBottom: '8px' }}>
+    <select
+      value={editLocationTagId}
+      onChange={(e) => setEditLocationTagId(e.target.value)}
+      style={{ width: '100%', padding: '6px' }}
+    >
+      <option value="">Без геометки</option>
+      {locationTags.map(tag => (
+        <option key={tag.id} value={tag.id}>
+          {tag.name} — {tag.address}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
       <div>
         <button onClick={handleSave} style={{ marginRight: '8px', padding: '4px 12px' }}>
           Сохранить

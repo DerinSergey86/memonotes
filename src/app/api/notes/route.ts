@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       tags: JSON.stringify(body.tags),
       type: body.type || 'note',          // по умолчанию "note"
       userId: session.user.id,
+      locationTagId: body.locationTagId || null,
       dueDate: body.dueDate || null,
       latitude: body.latitude || null,
       longitude: body.longitude || null,
@@ -82,6 +83,7 @@ export async function PUT(request: Request) {
       title: updatedNote.title,
       content: updatedNote.content,
       tags: JSON.stringify(updatedNote.tags),
+      locationTagId: updatedNote.locationTagId || null,
     },
   });
 

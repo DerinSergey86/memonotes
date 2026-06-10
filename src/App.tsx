@@ -76,6 +76,15 @@ useEffect(() => {
     .finally(() => setLoading(false));
 }, [router]);
 
+useEffect(() => {
+  if (session?.user) {
+    fetch('/api/location-tags')
+      .then(res => res.json())
+      .then(data => setLocationTags(data || []))
+      .catch(console.error);
+  }
+}, [session]);
+
 
 const [searchQuery, setSearchQuery] = useState('');
 const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -448,7 +457,7 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
   opacity: isFormOpen ? 1 : 0,
 }}>
   
-  <AddNoteForm onAdd={handleAddNote} allTags={allTags} />
+  <AddNoteForm onAdd={handleAddNote} allTags={allTags} locationTags={locationTags} />
 </div>
       <hr style={{ marginLeft: '-20px', marginRight: '-20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
@@ -547,6 +556,7 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
           onDelete={handleDeleteNote}
           onUpdate={handleUpdateNote}
           onTagClick={handleTagClick}
+          locationTags={locationTags}
         />
       ))}
     </div>

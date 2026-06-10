@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { type LocationTag } from '@/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import LocationPickerMap from './LocationPickerMap';
 
 interface AddressFormModalProps {
   onSave: (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null }) => void;
@@ -21,20 +22,6 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
 
   const { getPosition } = useGeolocation();
 
-  const handleGetCoords = async () => {
-    setGettingCoords(true);
-    setLocalError('');
-    try {
-      const coords = await getPosition();
-      setLatitude(coords.latitude);
-      setLongitude(coords.longitude);
-    } catch (err: unknown) {
-  const message = err instanceof Error ? err.message : 'Не удалось получить координаты';
-  setLocalError(message);
-} finally {
-      setGettingCoords(false);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,14 +71,37 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
             <label>Радиус (м):</label>
             <input type="number" value={radius} onChange={e => setRadius(e.target.value)} style={{ width: '100%', marginTop: '4px' }} />
           </div>
-          <div style={{ marginBottom: '12px' }}>
-            <button type="button" onClick={handleGetCoords} disabled={gettingCoords} style={{ padding: '6px 12px' }}>
-              {gettingCoords ? 'Определение...' : '📍 Определить координаты'}
-            </button>
-            {latitude && longitude && (
-              <p style={{ fontSize: '12px', color: 'green' }}>✅ {latitude.toFixed(6)}, {longitude.toFixed(6)}</p>
-            )}
-          </div>
+          <button type="button" onClick={async () => {
+  setGettingCoords(true);
+  try {
+    const coords = await getPosition();
+    setLatitude(coords.latitude);
+    setLongitude(coords.longitude);
+  } catch  {
+    setLocalError('Не удалось получить координаты');
+  } finally {
+    setGettingCoords(false);
+  }
+}} disabled={gettingCoords} style={{ marginTop: '4px', padding: '4px 8px' }}>
+  {gettingCoords ? 'Поиск...' : '📍 Определить моё местоположение'}
+</button>
+            <div style={{ marginBottom: '12px' }}>
+  <label>Выберите точку на карте:</label>
+  <LocationPickerMap
+    latitude={latitude}
+    longitude={longitude}
+    onLocationChange={(lat, lng) => {
+      setLatitude(lat);
+      setLongitude(lng);
+      setLocalError('');
+    }}
+  />
+  {latitude && longitude && (
+    <p style={{ fontSize: '12px', color: 'green' }}>
+      ✅ Координаты: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+    </p>
+  )}
+</div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
             <button type="button" onClick={onClose}>Отмена</button>
             <button type="submit">Сохранить</button>
