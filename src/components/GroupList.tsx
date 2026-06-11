@@ -10,7 +10,7 @@ interface GroupListProps {
   activeTags: string[];
 }
 
-function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, activeTags }: GroupListProps) {
+function GroupList({ groups, onGroupClick, onEditGroup, activeTags }: GroupListProps) {
   const { ref, isDragging, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
   const scroll = (direction: 'left' | 'right') => {
@@ -26,24 +26,7 @@ function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, activeTags }
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
         <h2 style={{ margin: 0 }}>Группы</h2>
-        <button onClick={onAddGroup} style={{
-          background: '#859c5e',
-  border: 'none',
-  fontSize: '24px',
-  cursor: 'pointer',
-  marginLeft: '15px',
-  lineHeight: 1,
-  color: 'white',
-  width: '40px',
-  height: '40px',
-  borderRadius: '50%',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-        }}>
-          ＋
-        </button>
+      
       </div>
 
       {/* Основной контейнер для карусели */}

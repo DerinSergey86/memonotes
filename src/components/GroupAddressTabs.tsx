@@ -85,20 +85,20 @@ export default function GroupAddressTabs({
 
         {/* Кнопка "+" */}
         <button onClick={showAddresses ? onAddAddress : onAddGroup} style={{
-          background: '#859c5e',
-          border: 'none',
-          fontSize: '24px',
-          cursor: 'pointer',
-          lineHeight: 1,
-          color: 'white',
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 0,
+           background: '#859c5e',
+  border: 'none',
+  fontSize: '18px',
+  cursor: 'pointer',
+  lineHeight: 1,
+  color: 'white',
+  width: '28px',
+  height: '28px',
+  borderRadius: '50%',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
         }}>
           ＋
         </button>

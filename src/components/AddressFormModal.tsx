@@ -13,10 +13,11 @@ interface AddressFormModalProps {
   longitude: number | null;
 }) => void;
   onClose: () => void;
+  onDelete?: (id: string) => void;
   initial?: LocationTag | null;
 }
 
-export default function AddressFormModal({ onSave, onClose, initial }: AddressFormModalProps) {
+export default function AddressFormModal({ onSave, onClose, onDelete, initial }: AddressFormModalProps) {
   const [name, setName] = useState(initial?.name || '');
   const [address, setAddress] = useState(initial?.address || '');
   const [radius, setRadius] = useState(initial?.radius?.toString() || '50');
@@ -109,6 +110,18 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
   </div>
 )}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            {initial && onDelete && (
+  <div style={{ marginBottom: '12px', textAlign: 'left' }}>
+    <button type="button" onClick={() => {
+      if (window.confirm('Удалить этот адрес?')) {
+        onDelete(initial.id);
+        onClose();
+      }
+    }} style={{ color: 'red', padding: '4px 8px', borderRadius: '8px', border: 'solid 1px black'}}>
+      Удалить адрес
+    </button>
+  </div>
+)}
             <button type="button" onClick={onClose} style={{ borderRadius: '8px', border: 'solid 1px', padding: '4px 8px'}} >Отмена</button>
             <div style={{ marginBottom: '12px' }}>
 </div>

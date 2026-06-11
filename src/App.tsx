@@ -556,6 +556,7 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     initial={editingAddress}
     onSave={handleSaveAddress}
     onClose={() => setEditingAddress(undefined)}
+    onDelete={handleDeleteAddress}
   />
 )}
     </div>
