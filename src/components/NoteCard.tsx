@@ -103,12 +103,15 @@ const [editNotifyOnExit, setEditNotifyOnExit] = useState(note.notifyOnExit ?? tr
   </div>
 )}
         <div style={{ marginTop: '8px' }}>
-          <button onClick={handleStartEditing} style={{ marginRight: '8px', padding: '4px 8px' }}>
+          <button onClick={handleStartEditing} 
+          style={{ marginRight: '8px', padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' 
+            
+          }}>
             Редактировать
           </button>
           <button onClick={() => {
             if (window.confirm('Удалить заметку?')) onDelete(note.id);
-          }} style={{ color: 'red', padding: '4px 8px' }}>
+          }} style={{ color: 'red', padding: '4px 8px', borderRadius: '8px', border: 'solid 1px black' }}>
             Удалить
           </button>
         </div>
@@ -162,22 +165,24 @@ const [editNotifyOnExit, setEditNotifyOnExit] = useState(note.notifyOnExit ?? tr
       ))}
     </select>
     <>
-    <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div style={{ textAlign: 'left', marginBottom: '8px' }}>
+    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
       <input type="checkbox" checked={editNotifyOnEnter} onChange={e => setEditNotifyOnEnter(e.target.checked)} />
       Уведомить при входе
     </label>
-    <label >
+    <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <input type="checkbox" checked={editNotifyOnExit} onChange={e => setEditNotifyOnExit(e.target.checked)} />
       Уведомить при выходе
     </label>
+  </div>
   </>
   </div>
 )}
       <div>
-        <button onClick={handleSave} style={{ marginRight: '8px', padding: '4px 12px' }}>
+        <button onClick={handleSave} style={{ marginRight: '8px', padding: '4px 12px', borderRadius: '8px', border: 'solid 1px' }}>
           Сохранить
         </button>
-        <button onClick={handleCancel} style={{ padding: '4px 12px' }}>
+        <button onClick={handleCancel} style={{ padding: '4px 12px', borderRadius: '8px', border: 'solid 1px' }}>
           Отмена
         </button>
       </div>

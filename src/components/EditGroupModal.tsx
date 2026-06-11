@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 import { type Group } from '../types';
 
@@ -111,7 +112,7 @@ function EditGroupModal({ group, onSave, onClose }: EditGroupModalProps) {
   background: '#f0f0f0', 
   border: '1px solid #ccc', 
   borderRadius: '4px',
-  fontSize: '14px'
+  fontSize: '14px',
 }}>
   Выберите файл
   <input
@@ -125,8 +126,8 @@ function EditGroupModal({ group, onSave, onClose }: EditGroupModalProps) {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px',  }}>
-            <button type="button" onClick={onClose} style={{ padding: '4px 8px' }}>Отмена</button>
-            <button type="submit" style={{ padding: '4px 8px' }}>Сохранить</button>
+            <button type="button" onClick={onClose} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Отмена</button>
+            <button type="submit" style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Сохранить</button>
           </div>
         </form>
       </div>

@@ -7,11 +7,10 @@ interface GroupListProps {
   onGroupClick: (group: Group) => void;
   onEditGroup: (group: Group) => void;
   onAddGroup: () => void;
-  onShowAddresses: () => void;
   activeTags: string[];
 }
 
-function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddresses, activeTags }: GroupListProps) {
+function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, activeTags }: GroupListProps) {
   const { ref, isDragging, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
   const scroll = (direction: 'left' | 'right') => {
@@ -28,33 +27,22 @@ function GroupList({ groups, onGroupClick, onEditGroup, onAddGroup, onShowAddres
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
         <h2 style={{ margin: 0 }}>Группы</h2>
         <button onClick={onAddGroup} style={{
-          background: 'transparent',
-          border: 'none',
-          fontSize: '24px',
-          cursor: 'pointer',
-          marginLeft: '15px',
-          lineHeight: 1,
+          background: '#859c5e',
+  border: 'none',
+  fontSize: '24px',
+  cursor: 'pointer',
+  marginLeft: '15px',
+  lineHeight: 1,
+  color: 'white',
+  width: '40px',
+  height: '40px',
+  borderRadius: '50%',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
         }}>
           ＋
-        </button>
-        <button onClick={onShowAddresses} style={{
-          textDecoration: 'none',
-          background: '#f0f0f0',
-          color: '#333',
-          padding: '4px 12px',
-          borderRadius: '20px',
-          fontSize: '14px',
-          marginLeft: '15px',
-          whiteSpace: 'nowrap',
-          border: '1px solid #ccc',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '4px',
-          cursor: 'pointer',
-          boxShadow: 'none',
-          transition: 'background 0.2s',
-        }}>
-          🗺️ Мои адреса
         </button>
       </div>
 

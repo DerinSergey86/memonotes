@@ -88,7 +88,7 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
   } finally {
     setGettingCoords(false);
   }
-}} disabled={gettingCoords} style={{ marginTop: '4px', padding: '4px 8px' }}>
+}} disabled={gettingCoords} style={{ marginTop: '4px', padding: '4px 8px', border: 'solid 1px', borderRadius: '8px' }}>
   {gettingCoords ? 'Поиск...' : '📍 Определить моё местоположение'}
 </button>
             <div style={{ marginBottom: '12px' }}>
@@ -109,22 +109,10 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
   </div>
 )}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-            <button type="button" onClick={onClose}>Отмена</button>
+            <button type="button" onClick={onClose} style={{ borderRadius: '8px', border: 'solid 1px', padding: '4px 8px'}} >Отмена</button>
             <div style={{ marginBottom: '12px' }}>
-  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-    <input
-      type="checkbox"
-    />
-    Уведомлять при входе
-  </label>
-  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-    <input
-      type="checkbox"
-    />
-    Уведомлять при выходе
-  </label>
 </div>
-            <button type="submit">Сохранить</button>
+            <button type="submit" style={{ borderRadius: '8px', border: 'solid 1px', padding: '4px 8px' }} >Сохранить</button>
           </div>
         </form>
       </div>

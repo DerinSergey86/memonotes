@@ -5,30 +5,29 @@ interface AddressListProps {
   onEdit: (tag: LocationTag) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
-  onBack: () => void;
 }
 
-export default function AddressList({ tags, onEdit, onDelete, onAdd, onBack }: AddressListProps) {
+export default function AddressList({ tags, onEdit, onDelete, onAdd }: AddressListProps) {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-        <button onClick={onBack} style={{
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '20px',
-          marginRight: '15px',
-        }}>
-          ← Назад
-        </button>
-        <h2 style={{ margin: 0 }}>Мои адреса</h2>
+        
+        <h2 style={{ margin: 0 }}>Адреса</h2>
         <button onClick={onAdd} style={{
-          background: 'transparent',
-          border: 'none',
-          fontSize: '24px',
-          cursor: 'pointer',
-          marginLeft: '15px',
-          lineHeight: 1,
+          background: '#859c5e',
+  border: 'none',
+  fontSize: '24px',
+  cursor: 'pointer',
+  marginLeft: '15px',
+  lineHeight: 1,
+  color: 'white',
+  width: '40px',
+  height: '40px',
+  borderRadius: '50%',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
         }}>
           ＋
         </button>
@@ -58,8 +57,8 @@ export default function AddressList({ tags, onEdit, onDelete, onAdd, onBack }: A
       </a>
     )}
             <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '8px' }}>
-              <button onClick={() => onEdit(tag)} style={{ padding: '4px 8px' }}>✎</button>
-              <button onClick={() => { if (window.confirm('Удалить адрес?')) onDelete(tag.id); }} style={{ padding: '4px 8px', color: 'red' }}>✕</button>
+              <button onClick={() => onEdit(tag)} style={{ padding: '4px 8px', border: 'solid 1px', borderRadius: '4px' }}>✎</button>
+              <button onClick={() => { if (window.confirm('Удалить адрес?')) onDelete(tag.id); }} style={{ padding: '4px 8px', color: 'red', borderRadius: '4px', border: 'solid 1px black' }}>✕</button>
             </div>
           </div>
         ))}

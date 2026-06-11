@@ -65,7 +65,7 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
     <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
       <input type="submit" style={{ display: 'none' }} />
       <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-        <button type="button" onClick={handleClear} style={{ padding: '4px 8px' }}>
+        <button type="button" onClick={handleClear} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>
           Очистить
         </button>
         <input
@@ -73,7 +73,7 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
           placeholder="Заголовок заметки"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          style={{ flex: 1 }}
+          style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
         />
       </div>
       <textarea
@@ -81,7 +81,7 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={4}
-        style={{ width: '100%', marginBottom: '8px' }}
+        style={{ width: '100%', marginBottom: '8px', borderRadius: '8px', border: 'solid 1px' }}
       />
       
       {/* Блок тегов */}
@@ -102,7 +102,7 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
               <button
                 type="button"
                 onClick={() => handleRemoveTag(tag)}
-                style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}
+                style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold', borderRadius: '8px' }}
               >
                 ×
               </button>
@@ -117,14 +117,14 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
             onChange={(e) => setInputTag(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTag(); } }}
             list="tags-list"
-            style={{ flex: 1 }}
+            style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
           />
           <datalist id="tags-list">
             {allTags.map(tag => (
               <option key={tag} value={tag} />
             ))}
           </datalist>
-          <button type="button" onClick={handleAddTag } style={{ padding: '4px 8px' }}>Добавить</button>
+          <button type="button" onClick={handleAddTag } style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
         </div>
       </div>
       <div style={{ marginBottom: '8px' }}>
@@ -175,7 +175,7 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
 )}
 
 <div style={{ textAlign: 'center', marginTop: '8px' }}>
-      <button type="submit" style={{ padding: '4px 8px' }}>Добавить заметку</button>
+      <button type="submit" style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить заметку</button>
     </div>
     </form>
   );
