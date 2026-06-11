@@ -109,24 +109,46 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
     </p>
   </div>
 )}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-            {initial && onDelete && (
-  <div style={{ marginBottom: '12px', textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
+  {initial && onDelete && (
     <button type="button" onClick={() => {
       if (window.confirm('Удалить этот адрес?')) {
         onDelete(initial.id);
         onClose();
       }
-    }} style={{ color: 'red', padding: '4px 8px', borderRadius: '8px', border: 'solid 1px black'}}>
+    }} style={{
+      color: '#d32f2f',
+      padding: '6px 14px',
+      borderRadius: '4px',
+      fontSize: '14px',
+      border: '1px solid #d32f2f',
+      background: '#fff',
+      cursor: 'pointer',
+      lineHeight: '1.4',
+    }}>
       Удалить адрес
     </button>
-  </div>
-)}
-            <button type="button" onClick={onClose} style={{ borderRadius: '8px', border: 'solid 1px', padding: '4px 8px'}} >Отмена</button>
-            <div style={{ marginBottom: '12px' }}>
+  )}
+  <button type="button" onClick={onClose} style={{
+    padding: '6px 14px',
+    borderRadius: '4px',
+    fontSize: '14px',
+    border: '1px solid #ccc',
+    background: '#fff',
+    cursor: 'pointer',
+    lineHeight: '1.4',
+  }}>Отмена</button>
+  <button type="submit" style={{
+    padding: '6px 14px',
+    borderRadius: '4px',
+    fontSize: '14px',
+    background: '#859c5e',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    lineHeight: '1.4',
+  }}>Сохранить</button>
 </div>
-            <button type="submit" style={{ borderRadius: '8px', border: 'solid 1px', padding: '4px 8px' }} >Сохранить</button>
-          </div>
         </form>
       </div>
     </div>

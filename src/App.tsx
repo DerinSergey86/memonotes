@@ -443,8 +443,13 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
   <AddNoteForm onAdd={handleAddNote} allTags={allTags} locationTags={locationTags} />
 </div>
       <hr style={{ marginLeft: '-20px', marginRight: '-20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
+    
   {/* Сегментированный переключатель */}
+<div style={{ display: 'flex', alignItems: 'center', margin: '16px 0' }}>
+  {/* Пустой блок слева для баланса */}
+  <div style={{ flex: '1' }}></div>
+  
+  {/* Переключатель по центру */}
   <div style={{
     display: 'inline-flex',
     borderRadius: '20px',
@@ -480,55 +485,54 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
       📌 Дела
     </button>
   </div>
-  {!isSearchOpen ? (
-    <button
-      onClick={() => setIsSearchOpen(true)}
-      style={{
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        fontSize: '20px',
-        padding: '4px',
-        borderRadius: '50%',
-      }}
-      title="Поиск"
-    >
-      🔍
-    </button>
-  ) : (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '4px',
-      animation: 'fadeIn 0.2s ease',
-    }}>
-      <input
-        type="text"
-        placeholder="Поиск по заметкам..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        autoFocus
-        style={{
-          padding: '4px 8px',
-          borderRadius: '4px',
-          border: '1px solid #ccc',
-          width: '200px',
-        }}
-      />
+  
+  {/* Блок справа с лупой */}
+  <div style={{ flex: '1', display: 'flex', justifyContent: 'flex-end' }}>
+    {!isSearchOpen ? (
       <button
-        onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+        onClick={() => setIsSearchOpen(true)}
         style={{
           background: 'transparent',
           border: 'none',
           cursor: 'pointer',
-          fontSize: '16px',
+          fontSize: '20px',
+          padding: '4px',
+          borderRadius: '50%',
         }}
+        title="Поиск"
       >
-        ✕
+        🔍
       </button>
-    </div>
-  )}
-</div>
+    ) : (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <input
+          type="text"
+          placeholder="Поиск по заметкам..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          autoFocus
+          style={{
+            padding: '4px 8px',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+            width: '200px',
+          }}
+        />
+        <button
+          onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '16px',
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    )}
+  </div>
+  </div>
    <div style={{ display: 'flex',
      flexDirection: 'column',
       alignItems: 'center' }}>

@@ -29,7 +29,7 @@ export default function GroupAddressTabs({
   onEditGroup,
   onAddGroup,
   onEditAddress,
-  onDeleteAddress,
+
   onAddAddress,
   activeTags,
   geoEnabled,
@@ -123,8 +123,6 @@ export default function GroupAddressTabs({
         <AddressList
           tags={locationTags}
           onEdit={onEditAddress}
-          onDelete={onDeleteAddress}
-          onAdd={onAddAddress}
         />
       ) : (
         <GroupList
