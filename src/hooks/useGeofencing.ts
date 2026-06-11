@@ -29,33 +29,48 @@ export function useGeofencing({ locationTags, notes, enabled }: UseGeofencingPro
     locationTags.forEach(tag => {
       if (!tag.latitude || !tag.longitude || !tag.radius) return;
 
-      // Проверяем, есть ли задачи, привязанные к этой геометке и не завершённые
+      
+
+ const distance = getDistanceFromLatLngInMeters(latitude, longitude, tag.latitude, tag.longitude);
+const inside = distance <= tag.radius;
+const alreadyNotified = notifiedTags.has(tag.id);
+
+// Проверяем, есть ли задачи, привязанные к этой геометке и не завершённые
       const hasActiveTasks = notes.some(note =>
         note.locationTagId === tag.id &&
         note.type === 'task' &&
-        !note.completed
+        !note.completed &&
+        (
+    (inside && note.notifyOnEnter) ||
+    (!inside && note.notifyOnExit)
+  )
       );
 
       if (!hasActiveTasks) return; // если задач нет, ничего не делаем
 
-      const distance = getDistanceFromLatLngInMeters(
-        latitude, longitude,
-        tag.latitude, tag.longitude
-      );
-      const inside = distance <= tag.radius;
-      const alreadyNotified = notifiedTags.has(tag.id);
+if (inside && !alreadyNotified) {
+  // Проверяем, есть ли задачи с notifyOnEnter = true
+  const enterTasks = notes.some(note =>
+    note.locationTagId === tag.id && note.type === 'task' && !note.completed && note.notifyOnEnter
+  );
+  if (enterTasks) {
+    showNotification(`📍 Вы вошли в зону "${tag.name}"`, `Есть активные задачи`);
+    setNotifiedTags(prev => new Set(prev).add(tag.id));
+  }
+} else if (!inside && alreadyNotified) {
+  const exitTasks = notes.some(note =>
+    note.locationTagId === tag.id && note.type === 'task' && !note.completed && note.notifyOnExit
+  );
+  if (exitTasks) {
+    showNotification(`🚪 Вы покинули зону "${tag.name}"`, `Есть активные задачи`);
+    setNotifiedTags(prev => {
+      const next = new Set(prev);
+      next.delete(tag.id);
+      return next;
+    });
+  }
+}
 
-      if (inside && !alreadyNotified) {
-        showNotification(`📍 Вы вошли в зону "${tag.name}"`, `Активные задачи: ${tag.address}`);
-        setNotifiedTags(prev => new Set(prev).add(tag.id));
-      } else if (!inside && alreadyNotified) {
-        showNotification(`🚪 Вы покинули зону "${tag.name}"`, tag.address);
-        setNotifiedTags(prev => {
-          const next = new Set(prev);
-          next.delete(tag.id);
-          return next;
-        });
-      }
     });
   }, [latitude, longitude, enabled, locationTags, notes, notifiedTags]);
 

@@ -5,7 +5,13 @@ import { type LocationTag } from '@/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
 
 interface AddressFormModalProps {
-  onSave: (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null }) => void;
+  onSave: (data: {
+  name: string;
+  address: string;
+  radius: number;
+  latitude: number | null;
+  longitude: number | null;
+}) => void;
   onClose: () => void;
   initial?: LocationTag | null;
 }
@@ -18,6 +24,7 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
   const [longitude, setLongitude] = useState<number | null>(initial?.longitude || null);
   const [localError, setLocalError] = useState('');
   const [gettingCoords, setGettingCoords] = useState(false);
+  
 
   const { getPosition } = useGeolocation();
 
@@ -30,10 +37,10 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
     }
     onSave({
       name: name.trim(),
-      address: address.trim(),
-      radius: parseFloat(radius) || 100,
-      latitude,
-      longitude,
+  address: address.trim(),
+  radius: parseFloat(radius) || 50,
+  latitude,
+  longitude,
     });
   };
 
@@ -103,6 +110,20 @@ export default function AddressFormModal({ onSave, onClose, initial }: AddressFo
 )}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
             <button type="button" onClick={onClose}>Отмена</button>
+            <div style={{ marginBottom: '12px' }}>
+  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <input
+      type="checkbox"
+    />
+    Уведомлять при входе
+  </label>
+  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+    <input
+      type="checkbox"
+    />
+    Уведомлять при выходе
+  </label>
+</div>
             <button type="submit">Сохранить</button>
           </div>
         </form>

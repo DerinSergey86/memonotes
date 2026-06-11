@@ -13,6 +13,8 @@ export interface Note {
   location?: string | null;
   locationTagId?: string | null;
   locationTag?: LocationTag | null;
+  notifyOnEnter?: boolean;
+notifyOnExit?: boolean;
 }
 
 export interface Group {

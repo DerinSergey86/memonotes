@@ -14,6 +14,9 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
   const [inputTag, setInputTag] = useState('');
   const [noteType, setNoteType] = useState<'note' | 'task'>('note');
   const [selectedLocationTagId, setSelectedLocationTagId] = useState<string>('');
+  const [notifyOnEnter, setNotifyOnEnter] = useState(true);
+  const [notifyOnExit, setNotifyOnExit] = useState(true);
+
 
   const handleAddTag = () => {
     const trimmed = inputTag.trim().toLowerCase();
@@ -39,6 +42,8 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
       type: noteType,              
       createdAt: new Date().toISOString(),
       locationTagId: noteType === 'task' ? selectedLocationTagId || null : null,
+    notifyOnEnter: notifyOnEnter,
+  notifyOnExit: notifyOnExit,
     };
 
    onAdd(newNote);
@@ -143,6 +148,7 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
         </label>
       </div>
       {noteType === 'task' && (
+        <>
   <div style={{ marginBottom: '8px' }}>
     <select
       value={selectedLocationTagId}
@@ -157,7 +163,17 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
       ))}
     </select>
   </div>
+    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+      <input type="checkbox" checked={notifyOnEnter} onChange={e => setNotifyOnEnter(e.target.checked)} />
+      Уведомить при входе
+    </label>
+    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+      <input type="checkbox" checked={notifyOnExit} onChange={e => setNotifyOnExit(e.target.checked)} />
+      Уведомить при выходе
+    </label>
+  </>
 )}
+
 <div style={{ textAlign: 'center', marginTop: '8px' }}>
       <button type="submit" style={{ padding: '4px 8px' }}>Добавить заметку</button>
     </div>

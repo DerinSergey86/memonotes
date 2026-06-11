@@ -31,6 +31,8 @@ model Note {
   location      String?
   locationTag   LocationTag? @relation(fields: [locationTagId], references: [id])
   locationTagId String?
+  notifyOnEnter Boolean @default(true)
+notifyOnExit  Boolean @default(true)
 }
 
 model LocationTag {

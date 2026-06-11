@@ -19,31 +19,30 @@ export async function GET() {
 
 // POST /api/location-tags
 export async function POST(request: Request) {
-  console.log('POST /api/location-tags called');
   const session = await auth();
-  console.log('session:', session?.user?.id);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
   }
 
   const body = await request.json();
-  console.log('body:', body);
-  const { name, address, latitude, longitude, radius } = body;
+  const { name, address, latitude, longitude, radius, notifyOnEnter, notifyOnExit  } = body;
 
   if (!name || !address) {
     return NextResponse.json({ error: 'Название и адрес обязательны' }, { status: 400 });
   }
 
-  const tag = await prisma.locationTag.create({
-    data: {
-      name,
-      address,
-      latitude: latitude || null,
-      longitude: longitude || null,
-      radius: Number(radius) || 50,
-      userId: session.user.id,
-    },
-  });
+ const tag = await prisma.locationTag.create({
+  data: {
+    name,
+    address,
+    latitude: latitude || null,
+    longitude: longitude || null,
+    radius: Number(radius) || 100,
+    notifyOnEnter: notifyOnEnter !== false, // если не передано, ставим true
+    notifyOnExit: notifyOnExit !== false,
+    userId: session.user.id,
+  },
+});
 
   return NextResponse.json(tag, { status: 201 });
 }
@@ -69,13 +68,15 @@ export async function PUT(request: Request) {
 
   const updated = await prisma.locationTag.update({
     where: { id },
-    data: {
-      name,
-      address,
-      latitude: latitude ?? existing.latitude,
-      longitude: longitude ?? existing.longitude,
-      radius: radius !== undefined ? Number(radius) : existing.radius,
-    },
+data: {
+  name,
+  address,
+  latitude: latitude ?? existing.latitude,
+  longitude: longitude ?? existing.longitude,
+  radius: radius !== undefined ? Number(radius) : existing.radius,
+  notifyOnEnter: body.notifyOnEnter !== undefined ? body.notifyOnEnter : existing.notifyOnEnter,
+  notifyOnExit: body.notifyOnExit !== undefined ? body.notifyOnExit : existing.notifyOnExit,
+},
   });
 
   return NextResponse.json(updated);

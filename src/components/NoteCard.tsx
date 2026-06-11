@@ -17,6 +17,9 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
   const [editContent, setEditContent] = useState(note.content);
   const [editTags, setEditTags] = useState(note.tags.join(', '));
 const [editLocationTagId, setEditLocationTagId] = useState(note.locationTagId || '');
+const [editNotifyOnEnter, setEditNotifyOnEnter] = useState(note.notifyOnEnter ?? true);
+const [editNotifyOnExit, setEditNotifyOnExit] = useState(note.notifyOnExit ?? true);
+
 
   
   // Вход в режим редактирования: сбрасываем поля на текущие значения заметки
@@ -34,7 +37,7 @@ const [editLocationTagId, setEditLocationTagId] = useState(note.locationTagId ||
 
   // Сохранение: собираем новый объект заметки и передаём наверх
   const handleSave = () => {
-    if (!editTitle.trim() || !editContent.trim() || !editTags.trim()) return;
+    if (!editTitle.trim() || !editContent.trim() || !editTags.trim() || !editNotifyOnEnter || !editNotifyOnExit) return;
 
     
 
@@ -43,6 +46,8 @@ const [editLocationTagId, setEditLocationTagId] = useState(note.locationTagId ||
   title: editTitle.trim(),
   content: editContent.trim(),
   tags: editTags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
+  notifyOnEnter: editNotifyOnEnter,
+  notifyOnExit: editNotifyOnExit,
   type: note.type,  
   locationTagId: note.type === 'task' ? editLocationTagId || null : null,
 };
@@ -156,6 +161,16 @@ const [editLocationTagId, setEditLocationTagId] = useState(note.locationTagId ||
         </option>
       ))}
     </select>
+    <>
+    <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <input type="checkbox" checked={editNotifyOnEnter} onChange={e => setEditNotifyOnEnter(e.target.checked)} />
+      Уведомить при входе
+    </label>
+    <label >
+      <input type="checkbox" checked={editNotifyOnExit} onChange={e => setEditNotifyOnExit(e.target.checked)} />
+      Уведомить при выходе
+    </label>
+  </>
   </div>
 )}
       <div>

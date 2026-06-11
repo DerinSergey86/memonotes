@@ -40,6 +40,8 @@ export async function POST(request: Request) {
       latitude: body.latitude || null,
       longitude: body.longitude || null,
       location: body.location || null,
+      notifyOnEnter: body.notifyOnEnter !== false,
+    notifyOnExit: body.notifyOnExit !== false,
     },
   });
 
@@ -84,6 +86,8 @@ export async function PUT(request: Request) {
       content: updatedNote.content,
       tags: JSON.stringify(updatedNote.tags),
       locationTagId: updatedNote.locationTagId || null,
+      notifyOnEnter: updatedNote.notifyOnEnter !== undefined ? updatedNote.notifyOnEnter : existingNote.notifyOnEnter,
+      notifyOnExit: updatedNote.notifyOnExit !== undefined ? updatedNote.notifyOnExit : existingNote.notifyOnExit,
     },
   });
 
