@@ -11,10 +11,11 @@ export interface Note {
   latitude?: number | null;
   longitude?: number | null;
   location?: string | null;
-  locationTagId?: string | null;
-  locationTag?: LocationTag | null;
+  locationTagIds?: string[];
   notifyOnEnter?: boolean;
 notifyOnExit?: boolean;
+enterLocationTagIds?: string[];
+  exitLocationTagIds?: string[];
 }
 
 export interface Group {

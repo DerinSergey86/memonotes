@@ -40,8 +40,8 @@ export default function LocationPickerMap({ latitude, longitude, onLocationChang
       style={{ height: '300px', width: '100%', borderRadius: '8px', marginBottom: '12px' }}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       <MapClickHandler onClick={handleMapClick} />
       {latitude && longitude && (

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { type Group, type LocationTag } from '@/types';
@@ -18,6 +19,8 @@ interface GroupAddressTabsProps {
   activeTags: string[];
   geoEnabled: boolean;
   onToggleGeo: () => void;
+  onAddressClick: (tagId: string) => void;
+  activeLocationTagId: string | null;
 }
 
 export default function GroupAddressTabs({
@@ -29,11 +32,13 @@ export default function GroupAddressTabs({
   onEditGroup,
   onAddGroup,
   onEditAddress,
-
+  onDeleteAddress,
   onAddAddress,
   activeTags,
   geoEnabled,
   onToggleGeo,
+  onAddressClick,         
+  activeLocationTagId,    
 }: GroupAddressTabsProps) {
   return (
     <div>
@@ -123,6 +128,8 @@ export default function GroupAddressTabs({
         <AddressList
           tags={locationTags}
           onEdit={onEditAddress}
+          onAddressClick={onAddressClick}
+  activeLocationTagId={activeLocationTagId}
         />
       ) : (
         <GroupList

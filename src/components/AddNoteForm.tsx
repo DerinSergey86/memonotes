@@ -1,10 +1,12 @@
+'use client';
+
 import { useState } from 'react';
 import { type Note, type LocationTag } from '@/types';
 
 interface AddNoteFormProps {
   onAdd: (note: Note) => void;
   allTags: string[];
-  locationTags: LocationTag[];  
+  locationTags: LocationTag[];
 }
 
 function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
@@ -13,10 +15,10 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
   const [tagsArray, setTagsArray] = useState<string[]>([]);
   const [inputTag, setInputTag] = useState('');
   const [noteType, setNoteType] = useState<'note' | 'task'>('note');
-  const [selectedLocationTagId, setSelectedLocationTagId] = useState<string>('');
-  const [notifyOnEnter, setNotifyOnEnter] = useState(true);
-  const [notifyOnExit, setNotifyOnExit] = useState(true);
-
+  const [enterLocationTagIds, setEnterLocationTagIds] = useState<string[]>([]);
+  const [exitLocationTagIds, setExitLocationTagIds] = useState<string[]>([]);
+  const [enterInput, setEnterInput] = useState('');
+  const [exitInput, setExitInput] = useState('');
 
   const handleAddTag = () => {
     const trimmed = inputTag.trim().toLowerCase();
@@ -30,7 +32,27 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
     setTagsArray(prev => prev.filter(t => t !== tag));
   };
 
- const handleSubmit = (e: React.FormEvent) => {
+  const handleAddEnterTag = () => {
+    const trimmed = enterInput.trim();
+    if (!trimmed) return;
+    const found = locationTags.find(tag => tag.name.toLowerCase() === trimmed.toLowerCase());
+    if (found && !enterLocationTagIds.includes(found.id)) {
+      setEnterLocationTagIds(prev => [...prev, found.id]);
+    }
+    setEnterInput('');
+  };
+
+  const handleAddExitTag = () => {
+    const trimmed = exitInput.trim();
+    if (!trimmed) return;
+    const found = locationTags.find(tag => tag.name.toLowerCase() === trimmed.toLowerCase());
+    if (found && !exitLocationTagIds.includes(found.id)) {
+      setExitLocationTagIds(prev => [...prev, found.id]);
+    }
+    setExitInput('');
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
 
@@ -39,18 +61,19 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
       title: title.trim() || content.trim().slice(0, 50),
       content: content.trim(),
       tags: tagsArray,
-      type: noteType,              
+      type: noteType,
       createdAt: new Date().toISOString(),
-      locationTagId: noteType === 'task' ? selectedLocationTagId || null : null,
-    notifyOnEnter: notifyOnEnter,
-  notifyOnExit: notifyOnExit,
+      enterLocationTagIds: enterLocationTagIds,
+      exitLocationTagIds: exitLocationTagIds,
     };
 
-   onAdd(newNote);
+    onAdd(newNote);
     setTitle('');
     setContent('');
     setTagsArray([]);
-    setNoteType('note');               
+    setEnterLocationTagIds([]);
+    setExitLocationTagIds([]);
+    setNoteType('note');
   };
 
   const handleClear = () => {
@@ -58,10 +81,11 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
     setContent('');
     setTagsArray([]);
     setInputTag('');
+    setEnterLocationTagIds([]);
+    setExitLocationTagIds([]);
   };
 
   return (
-    
     <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
       <input type="submit" style={{ display: 'none' }} />
       <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
@@ -83,8 +107,7 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
         rows={4}
         style={{ width: '100%', marginBottom: '8px', borderRadius: '8px', border: 'solid 1px' }}
       />
-      
-      {/* Блок тегов */}
+
       <div style={{ marginBottom: '8px' }}>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '4px' }}>
           {tagsArray.map(tag => (
@@ -99,11 +122,10 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
               gap: '4px'
             }}>
               {tag}
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(tag)}
-                style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold', borderRadius: '8px' }}
-              >
+              <button type="button" onClick={() => handleRemoveTag(tag)} style={{
+                background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold',
+                borderRadius: '8px'
+              }}>
                 ×
               </button>
             </span>
@@ -124,59 +146,72 @@ function AddNoteForm({ onAdd, allTags, locationTags }: AddNoteFormProps) {
               <option key={tag} value={tag} />
             ))}
           </datalist>
-          <button type="button" onClick={handleAddTag } style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+          <button type="button" onClick={handleAddTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
         </div>
       </div>
+
       <div style={{ marginBottom: '8px' }}>
         <label style={{ marginRight: '10px' }}>
-          <input
-            type="radio"
-            value="note"
-            checked={noteType === 'note'}
-            onChange={() => setNoteType('note')}
-          />
+          <input type="radio" value="note" checked={noteType === 'note'} onChange={() => setNoteType('note')} />
           Знание
         </label>
         <label>
-          <input
-            type="radio"
-            value="task"
-            checked={noteType === 'task'}
-            onChange={() => setNoteType('task')}
-          />
+          <input type="radio" value="task" checked={noteType === 'task'} onChange={() => setNoteType('task')} />
           Дело
         </label>
       </div>
+
       {noteType === 'task' && (
         <>
-  <div style={{ marginBottom: '8px' }}>
-    <select
-      value={selectedLocationTagId}
-      onChange={(e) => setSelectedLocationTagId(e.target.value)}
-      style={{ width: '100%', padding: '6px' }}
-    >
-      <option value="">Без геометки</option>
-      {locationTags.map(tag => (
-        <option key={tag.id} value={tag.id}>
-          {tag.name} — {tag.address}
-        </option>
-      ))}
-    </select>
-  </div>
-    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-      <input type="checkbox" checked={notifyOnEnter} onChange={e => setNotifyOnEnter(e.target.checked)} />
-      Уведомить при входе
-    </label>
-    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-      <input type="checkbox" checked={notifyOnExit} onChange={e => setNotifyOnExit(e.target.checked)} />
-      Уведомить при выходе
-    </label>
-  </>
-)}
+          <div style={{ marginBottom: '8px' }}>
+            <strong>При входе:</strong>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '4px' }}>
+              {enterLocationTagIds.map(tagId => {
+                const tag = locationTags.find(t => t.id === tagId);
+                return tag ? (
+                  <span key={tagId} style={{ background: '#859c5e', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {tag.name}
+                    <button type="button" onClick={() => setEnterLocationTagIds(prev => prev.filter(id => id !== tagId))} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
+                  </span>
+                ) : null;
+              })}
+            </div>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <input type="text" placeholder="Добавить метку" value={enterInput} onChange={e => setEnterInput(e.target.value)} list="enter-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <datalist id="enter-tags-list">
+                {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
+              </datalist>
+              <button type="button" onClick={handleAddEnterTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+            </div>
+          </div>
 
-<div style={{ textAlign: 'center', marginTop: '8px' }}>
-      <button type="submit" style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить заметку</button>
-    </div>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>При выходе:</strong>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '4px' }}>
+              {exitLocationTagIds.map(tagId => {
+                const tag = locationTags.find(t => t.id === tagId);
+                return tag ? (
+                  <span key={tagId} style={{ background: '#859c5e', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {tag.name}
+                    <button type="button" onClick={() => setExitLocationTagIds(prev => prev.filter(id => id !== tagId))} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>×</button>
+                  </span>
+                ) : null;
+              })}
+            </div>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <input type="text" placeholder="Добавить метку" value={exitInput} onChange={e => setExitInput(e.target.value)} list="exit-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <datalist id="exit-tags-list">
+                {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
+              </datalist>
+              <button type="button" onClick={handleAddExitTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      <div style={{ textAlign: 'center', marginTop: '8px' }}>
+        <button type="submit" style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить заметку</button>
+      </div>
     </form>
   );
 }

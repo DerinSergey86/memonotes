@@ -7,7 +7,7 @@ import { useGeolocation } from './useGeolocation';
 
 interface UseGeofencingProps {
   locationTags: LocationTag[];
-  notes: Note[];           // ← передаём список всех заметок
+  notes: Note[];
   enabled: boolean;
 }
 
@@ -22,59 +22,38 @@ export function useGeofencing({ locationTags, notes, enabled }: UseGeofencingPro
     }
   };
 
-  // Функция проверки геозон с учётом активных задач
   const checkGeofences = useCallback(() => {
     if (!latitude || !longitude || !enabled) return;
 
     locationTags.forEach(tag => {
       if (!tag.latitude || !tag.longitude || !tag.radius) return;
 
-      
+      const distance = getDistanceFromLatLngInMeters(latitude, longitude, tag.latitude, tag.longitude);
+      const inside = distance <= tag.radius;
+      const alreadyNotified = notifiedTags.has(tag.id);
 
- const distance = getDistanceFromLatLngInMeters(latitude, longitude, tag.latitude, tag.longitude);
-const inside = distance <= tag.radius;
-const alreadyNotified = notifiedTags.has(tag.id);
-
-// Проверяем, есть ли задачи, привязанные к этой геометке и не завершённые
       const hasActiveTasks = notes.some(note =>
-        note.locationTagId === tag.id &&
-        note.type === 'task' &&
-        !note.completed &&
-        (
-    (inside && note.notifyOnEnter) ||
-    (!inside && note.notifyOnExit)
-  )
+        note.type === 'task' && !note.completed &&
+        ((inside && note.enterLocationTagIds?.includes(tag.id)) ||
+         (!inside && note.exitLocationTagIds?.includes(tag.id)))
       );
 
-      if (!hasActiveTasks) return; // если задач нет, ничего не делаем
+      if (!hasActiveTasks) return;
 
-if (inside && !alreadyNotified) {
-  // Проверяем, есть ли задачи с notifyOnEnter = true
-  const enterTasks = notes.some(note =>
-    note.locationTagId === tag.id && note.type === 'task' && !note.completed && note.notifyOnEnter
-  );
-  if (enterTasks) {
-    showNotification(`📍 Вы вошли в зону "${tag.name}"`, `Есть активные задачи`);
-    setNotifiedTags(prev => new Set(prev).add(tag.id));
-  }
-} else if (!inside && alreadyNotified) {
-  const exitTasks = notes.some(note =>
-    note.locationTagId === tag.id && note.type === 'task' && !note.completed && note.notifyOnExit
-  );
-  if (exitTasks) {
-    showNotification(`🚪 Вы покинули зону "${tag.name}"`, `Есть активные задачи`);
-    setNotifiedTags(prev => {
-      const next = new Set(prev);
-      next.delete(tag.id);
-      return next;
-    });
-  }
-}
-
+      if (inside && !alreadyNotified) {
+        showNotification(`📍 Вы вошли в зону "${tag.name}"`, `Есть активные задачи`);
+        setNotifiedTags(prev => new Set(prev).add(tag.id));
+      } else if (!inside && alreadyNotified) {
+        showNotification(`🚪 Вы покинули зону "${tag.name}"`, `Есть активные задачи`);
+        setNotifiedTags(prev => {
+          const next = new Set(prev);
+          next.delete(tag.id);
+          return next;
+        });
+      }
     });
   }, [latitude, longitude, enabled, locationTags, notes, notifiedTags]);
 
-  // Запуск интервала
   useEffect(() => {
     if (!enabled) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -90,7 +69,6 @@ if (inside && !alreadyNotified) {
     };
   }, [enabled, getPosition, checkGeofences]);
 
-  // Проверка при каждом обновлении координат
   useEffect(() => {
     if (latitude && longitude) checkGeofences();
   }, [latitude, longitude, checkGeofences]);

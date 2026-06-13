@@ -11,28 +11,26 @@ model User {
   email        String        @unique
   password     String
   notes        Note[]
-  locationTags LocationTag[] // новая связь
+  locationTags LocationTag[]
 }
 
 model Note {
-  id            String       @id @default(uuid())
-  title         String
-  content       String
-  tags          String
-  type          String       @default("note")
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  userId        String
-  user          User         @relation(fields: [userId], references: [id])
-  dueDate       DateTime?
-  completed     Boolean      @default(false)
-  latitude      Float?
-  longitude     Float?
-  location      String?
-  locationTag   LocationTag? @relation(fields: [locationTagId], references: [id])
-  locationTagId String?
-  notifyOnEnter Boolean @default(true)
-notifyOnExit  Boolean @default(true)
+  id                  String   @id @default(uuid())
+  title               String
+  content             String
+  tags                String
+  type                String   @default("note")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  dueDate             DateTime?
+  completed           Boolean  @default(false)
+  latitude            Float?
+  longitude           Float?
+  location            String?
+  enterLocationTagIds String?
+  exitLocationTagIds  String?
 }
 
 model LocationTag {
@@ -41,8 +39,7 @@ model LocationTag {
   address   String
   latitude  Float?
   longitude Float?
+  radius    Float?  @default(50)
   userId    String
   user      User    @relation(fields: [userId], references: [id])
-  notes     Note[]
-  radius Float? @default(50)
 }

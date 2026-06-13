@@ -39,6 +39,7 @@ const [showAddresses, setShowAddresses] = useState(false);
 const [locationTags, setLocationTags] = useState<LocationTag[]>([]);
 const [editingAddress, setEditingAddress] = useState<LocationTag | null | undefined>(undefined);
 const [geoEnabled, setGeoEnabled] = useState(false);
+const [locationTagFilter, setLocationTagFilter] = useState<string | null>(null);
 
 
 const { startWatching, stopWatching } = useGeofencing({
@@ -261,8 +262,19 @@ const filteredNotes = (() => {
   result = result.filter(note => note.type === noteTypeFilter);
 }
 
+if (locationTagFilter) {
+  result = result.filter(note =>
+    note.enterLocationTagIds?.includes(locationTagFilter) ||
+    note.exitLocationTagIds?.includes(locationTagFilter)
+  );
+}
+
   return result;
 })();
+
+const handleAddressClick = (tagId: string) => {
+  setLocationTagFilter(prev => prev === tagId ? null : tagId); // toggle
+};
 
 const handleTagClick = (tag: string) => {
   setActiveTags(prevTags =>
@@ -428,6 +440,8 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
     onAddAddress={handleOpenAddressForm}
     activeTags={activeTags}
     geoEnabled={geoEnabled}
+    onAddressClick={handleAddressClick}
+  activeLocationTagId={locationTagFilter}
     onToggleGeo={() => {
       if (!geoEnabled) {
         Notification.requestPermission().then(perm => {

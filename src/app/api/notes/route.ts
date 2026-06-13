@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/auth'; // импорт функции для получения сессии
+import { auth } from '@/auth';
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
   const notes = await prisma.note.findMany({
     where: { userId: session.user.id },
@@ -15,7 +13,9 @@ export async function GET() {
 
   const notesWithTags = notes.map((note) => ({
     ...note,
-    tags: JSON.parse(note.tags) as string[],
+    tags: JSON.parse(note.tags),
+    enterLocationTagIds: note.enterLocationTagIds ? JSON.parse(note.enterLocationTagIds) : [],
+    exitLocationTagIds: note.exitLocationTagIds ? JSON.parse(note.exitLocationTagIds) : [],
   }));
 
   return NextResponse.json(notesWithTags);
@@ -23,9 +23,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
   const body = await request.json();
   const note = await prisma.note.create({
@@ -33,35 +31,35 @@ export async function POST(request: Request) {
       title: body.title,
       content: body.content,
       tags: JSON.stringify(body.tags),
-      type: body.type || 'note',          // по умолчанию "note"
+      type: body.type || 'note',
       userId: session.user.id,
-      locationTagId: body.locationTagId || null,
       dueDate: body.dueDate || null,
       latitude: body.latitude || null,
       longitude: body.longitude || null,
       location: body.location || null,
-      notifyOnEnter: body.notifyOnEnter !== false,
-    notifyOnExit: body.notifyOnExit !== false,
+      enterLocationTagIds: JSON.stringify(body.enterLocationTagIds || []),
+      exitLocationTagIds: JSON.stringify(body.exitLocationTagIds || []),
     },
   });
 
   return NextResponse.json(
-    { ...note, tags: JSON.parse(note.tags) },
+    {
+      ...note,
+      tags: JSON.parse(note.tags),
+      enterLocationTagIds: body.enterLocationTagIds || [],
+      exitLocationTagIds: body.exitLocationTagIds || [],
+    },
     { status: 201 }
   );
 }
 
 export async function DELETE(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
   const { id } = await request.json();
   const note = await prisma.note.findUnique({ where: { id } });
-  if (!note || note.userId !== session.user.id) {
-    return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
-  }
+  if (!note || note.userId !== session.user.id) return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
 
   await prisma.note.delete({ where: { id } });
   return NextResponse.json({ success: true });
@@ -69,27 +67,27 @@ export async function DELETE(request: Request) {
 
 export async function PUT(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
-  const updatedNote = await request.json();
-  const existingNote = await prisma.note.findUnique({ where: { id: updatedNote.id } });
-  if (!existingNote || existingNote.userId !== session.user.id) {
-    return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
-  }
+  const body = await request.json();
+  const existingNote = await prisma.note.findUnique({ where: { id: body.id } });
+  if (!existingNote || existingNote.userId !== session.user.id) return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
 
   const note = await prisma.note.update({
-    where: { id: updatedNote.id },
+    where: { id: body.id },
     data: {
-      title: updatedNote.title,
-      content: updatedNote.content,
-      tags: JSON.stringify(updatedNote.tags),
-      locationTagId: updatedNote.locationTagId || null,
-      notifyOnEnter: updatedNote.notifyOnEnter !== undefined ? updatedNote.notifyOnEnter : existingNote.notifyOnEnter,
-      notifyOnExit: updatedNote.notifyOnExit !== undefined ? updatedNote.notifyOnExit : existingNote.notifyOnExit,
+      title: body.title,
+      content: body.content,
+      tags: JSON.stringify(body.tags),
+      enterLocationTagIds: JSON.stringify(body.enterLocationTagIds || []),
+      exitLocationTagIds: JSON.stringify(body.exitLocationTagIds || []),
     },
   });
 
-  return NextResponse.json({ ...note, tags: JSON.parse(note.tags) });
+  return NextResponse.json({
+    ...note,
+    tags: JSON.parse(note.tags),
+    enterLocationTagIds: body.enterLocationTagIds || [],
+    exitLocationTagIds: body.exitLocationTagIds || [],
+  });
 }

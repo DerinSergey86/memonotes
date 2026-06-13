@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { type LocationTag } from '@/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import LocationPickerMap from './LocationPickerMap';
+import dynamic from 'next/dynamic';
+
+const LocationPickerMap = dynamic(() => import('./LocationPickerMap'), {
+  ssr: false,
+});
 
 interface AddressFormModalProps {
   onSave: (data: {

@@ -4,11 +4,13 @@ import { useDragScroll } from '@/hooks/useDragScroll';
 interface AddressListProps {
   tags: LocationTag[];
   onEdit: (tag: LocationTag) => void;
+  onAddressClick: (tagId: string) => void;
+  activeLocationTagId: string | null;
 }
 
-export default function AddressList({ tags, onEdit }: AddressListProps) {
-  const { ref, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
-
+export default function AddressList({ tags, onEdit, onAddressClick, activeLocationTagId }: AddressListProps) {
+  const { ref, isDragging, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
+  
   const scroll = (direction: 'left' | 'right') => {
     if (!ref.current) return;
     const scrollAmount = 300;
@@ -40,15 +42,18 @@ export default function AddressList({ tags, onEdit }: AddressListProps) {
           }}
         >
           {tags.map(tag => (
-            <div key={tag.id} style={{
-              border: '1px solid #ccc',
+            <div key={tag.id} onClick={() => { if (!isDragging) onAddressClick(tag.id); }}
+            style={{
+              border: `2px solid ${activeLocationTagId === tag.id ? '#859c5e' : '#ccc'}`,
               borderRadius: '8px',
               padding: '10px',
               width: '200px',
               flexShrink: 0,
               textAlign: 'center',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              cursor: 'pointer',
               position: 'relative',
+              transition: 'border-color 0.2s',
             }}>
               {/* Кнопка редактирования — как в GroupCard */}
               <button
@@ -79,6 +84,7 @@ export default function AddressList({ tags, onEdit }: AddressListProps) {
               <div style={{ fontWeight: 'bold', marginBottom: '5px', marginTop: '10px' }}>
                 {tag.name}
               </div>
+
               <div style={{ fontSize: '14px', color: '#666' }}>
                 {tag.address}
               </div>
@@ -92,6 +98,7 @@ export default function AddressList({ tags, onEdit }: AddressListProps) {
                   >
                     🗺️ Карта
                   </a>
+                  
                 </div>
               )}
             </div>
