@@ -374,25 +374,42 @@ if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибк�
         </button>
       </span>
     ))}
-    <button
-  onClick={() => setStrictFilter(prev => !prev)}
-  style={{
-    marginLeft: '10px',
-    padding: '2px 8px',
-    background: strictFilter ? '#859c5e' : '#e0e0e0',
-    color: strictFilter ? 'white' : '#333',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
-  }}
-  title={strictFilter ? 'поиск по конкретным тегам' : 'все упомянутые теги во всех группах'}
->
-  {strictFilter ? 'только' : 'все'}
-</button>
-    <button onClick={() => setActiveTags([])} style={{ marginLeft: '10px' }}>
-      Сбросить всё
-    </button>
+    <div style={{
+  display: 'inline-flex',
+  borderRadius: '20px',
+  overflow: 'hidden',
+  border: '1px solid #859c5e',
+  marginLeft: '10px',
+}}>
+  <button
+    onClick={() => setStrictFilter(false)}
+    style={{
+      padding: '2px 8px',
+      border: 'none',
+      background: !strictFilter ? '#859c5e' : 'transparent',
+      color: !strictFilter ? 'white' : '#859c5e',
+      cursor: 'pointer',
+      fontSize: '14px',
+      transition: 'all 0.2s',
+    }}
+  >
+    Включающие
+  </button>
+  <button
+    onClick={() => setStrictFilter(true)}
+    style={{
+      padding: '2px 8px',
+      border: 'none',
+      background: strictFilter ? '#859c5e' : 'transparent',
+      color: strictFilter ? 'white' : '#859c5e',
+      cursor: 'pointer',
+      fontSize: '14px',
+      transition: 'all 0.2s',
+    }}
+  >
+    Только
+  </button>
+</div>
   </div>
 )}
 <hr style={{ marginLeft: '-20px', marginRight: '-20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
