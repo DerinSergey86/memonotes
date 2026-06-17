@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import NoteCard from '@/components/NoteCard';
 import AddNoteForm from '@/components/AddNoteForm';
 import { useMounted } from '@/hooks/useMounted';
@@ -15,7 +15,7 @@ import { useGeofencing } from '@/hooks/useGeofencing';
 import TagFilter from '@/components/TagFilter';
 import { useAllTags } from '@/hooks/useAllTags';
 
-function App() {
+export default function App() {
   const mounted = useMounted();
   const router = useRouter();
   const { data: session } = useSession();
@@ -35,6 +35,8 @@ function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [pendingLocationList, setPendingLocationList] = useState<'enter' | 'exit' | null>(null);
   const [autoAddTag, setAutoAddTag] = useState<{ listType: 'enter' | 'exit'; tagId: string } | null>(null);
+  const [focusedGroupId, setFocusedGroupId] = useState<string | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const [groups, setGroups] = useState<Group[]>([
     { id: '1', name: 'Семья', image: '/images/family.png', tags: ['семья'] },
@@ -50,17 +52,47 @@ function App() {
   ]);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 
+  const allTags = useAllTags(notes);
+  const { startWatching, stopWatching } = useGeofencing({ locationTags, notes, enabled: geoEnabled });
+
+  const noTagsGroup = useMemo<Group>(() => ({ id: 'no-tags', name: 'Без тегов', image: '/images/no-tags.png', tags: [] }), []);
+  const ungroupedGroup = useMemo<Group>(() => {
+    const grouped = new Set<string>();
+    groups.forEach(g => g.tags.forEach(t => grouped.add(t.toLowerCase())));
+    const ungrouped = allTags.filter(t => !grouped.has(t.toLowerCase()));
+    return { id: 'ungrouped', name: 'Теги без группы', image: '/images/ungrouped.png', tags: ungrouped };
+  }, [groups, allTags]);
+
+  const allGroups = useMemo(() => [...groups, ungroupedGroup, noTagsGroup], [groups, ungroupedGroup, noTagsGroup]);
+
   const handleGroupClick = (group: Group) => {
-    setActiveTags(prevTags => {
-      const allActive = group.tags.every(tag => prevTags.includes(tag));
-      if (allActive) {
-        return prevTags.filter(tag => !group.tags.includes(tag));
-      } else {
-        const newTags = group.tags.filter(tag => !prevTags.includes(tag));
-        return [...prevTags, ...newTags];
-      }
-    });
+    if (group.id === 'no-tags') {
+      setActiveTags(['__no_tags__']);
+      setStrictFilter(true);
+      setFocusedGroupId(null);
+      setFilterOpen(false);
+      return;
+    }
+    if (group.id === 'ungrouped') {
+      setActiveTags([]);
+      setStrictFilter(false);
+      setFocusedGroupId('ungrouped');
+      setFilterOpen(true);
+      return;
+    }
+    const mainTag = group.name.toLowerCase();
+    if (activeTags.includes(mainTag) && strictFilter) {
+      setActiveTags([]);
+      setStrictFilter(false);
+      setFocusedGroupId(null);
+    } else {
+      setActiveTags([mainTag]);
+      setStrictFilter(true);
+      setFocusedGroupId(group.id);
+    }
+    setFilterOpen(false);
   };
+
   const handleEditGroup = (group: Group) => setEditingGroup(group);
   const handleAddGroup = () => {
     const newGroup: Group = { id: '', name: '', image: '/images/default.png', tags: [] };
@@ -75,9 +107,6 @@ function App() {
     }
     setEditingGroup(null);
   };
-
-  const allTags = useAllTags(notes);
-  const { startWatching, stopWatching } = useGeofencing({ locationTags, notes, enabled: geoEnabled });
 
   useEffect(() => {
     fetch('/api/notes')
@@ -104,26 +133,33 @@ function App() {
     }
   }, [session]);
 
-  const filteredNotes = notes
-    .filter(note => {
-      if (activeTags.length > 0) {
-        if (strictFilter) {
-          if (!activeTags.every(tag => note.tags?.includes(tag))) return false;
-        } else {
-          if (!activeTags.some(tag => note.tags?.includes(tag))) return false;
-        }
-      }
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
-        if (!note.title?.toLowerCase().includes(q) &&
-            !note.content?.toLowerCase().includes(q) &&
-            !note.tags?.some(t => t.includes(q))) return false;
-      }
-      if (noteTypeFilter !== 'all' && note.type !== noteTypeFilter) return false;
-      if (locationTagFilter && !(note.enterLocationTagIds?.includes(locationTagFilter) || note.exitLocationTagIds?.includes(locationTagFilter))) return false;
-      return true;
-    })
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const filteredNotes = useMemo(() => {
+    let result = notes;
+    if (activeTags.includes('__no_tags__')) {
+      result = result.filter(note => !note.tags || note.tags.length === 0);
+    } else if (activeTags.length > 0) {
+      result = result.filter(note => {
+        if (strictFilter) return activeTags.every(tag => note.tags?.includes(tag));
+        return activeTags.some(tag => note.tags?.includes(tag));
+      });
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter(note =>
+        note.title?.toLowerCase().includes(q) ||
+        note.content?.toLowerCase().includes(q) ||
+        note.tags?.some(t => t.includes(q))
+      );
+    }
+    if (noteTypeFilter !== 'all') result = result.filter(note => note.type === noteTypeFilter);
+    if (locationTagFilter) {
+      result = result.filter(note =>
+        note.enterLocationTagIds?.includes(locationTagFilter) ||
+        note.exitLocationTagIds?.includes(locationTagFilter)
+      );
+    }
+    return [...result].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [notes, activeTags, strictFilter, searchQuery, noteTypeFilter, locationTagFilter]);
 
   const handleTagToggle = (tag: string) => {
     setActiveTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
@@ -175,7 +211,7 @@ function App() {
     setEditingAddress(null);
   };
 
-  const handleSaveAddress = async (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null }) => {
+  const handleSaveAddress = async (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null; image?: string }) => {
     const url = '/api/location-tags';
     const method = editingAddress ? 'PUT' : 'POST';
     const body = editingAddress ? { id: editingAddress.id, ...data } : data;
@@ -207,6 +243,20 @@ function App() {
     } else { setGeoEnabled(false); stopWatching(); }
   };
 
+  const focusedGroupTags = useMemo(() => {
+    if (focusedGroupId === 'ungrouped') return ungroupedGroup.tags;
+    if (focusedGroupId) {
+      const group = allGroups.find(g => g.id === focusedGroupId);
+      return group ? group.tags.filter(t => t !== group.name.toLowerCase()) : null;
+    }
+    return null;
+  }, [focusedGroupId, ungroupedGroup, allGroups]);
+
+  const handleFilterOpenChange = useCallback((open: boolean) => {
+    setFilterOpen(open);
+    if (!open) setFocusedGroupId(null);
+  }, []);
+
   if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Загрузка...</div>;
   if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибка: {error}</div>;
 
@@ -225,8 +275,19 @@ function App() {
           </div>
         </div>
 
-        {/* Фильтр тегов */}
-        <TagFilter allTags={allTags} activeTags={activeTags} onTagToggle={handleTagToggle} searchQuery={searchQuery} onSearchChange={setSearchQuery} strictFilter={strictFilter} onStrictFilterToggle={() => setStrictFilter(!strictFilter)} />
+        {/* Фильтр */}
+        <TagFilter
+          allTags={allTags}
+          activeTags={activeTags}
+          onTagToggle={handleTagToggle}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          strictFilter={strictFilter}
+          onStrictFilterToggle={() => setStrictFilter(!strictFilter)}
+          focusedGroupTags={focusedGroupTags}
+          isOpen={filterOpen}
+          onOpenChange={handleFilterOpenChange}
+        />
 
         {/* Переключатель Группы / Адреса + кнопка добавления + геозоны */}
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
@@ -242,18 +303,28 @@ function App() {
           }}>
             ＋
           </button>
-          <button onClick={handleGeoClick} style={{ height: '28px', padding: '0 14px', borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center' }}>{geoEnabled ? '📍 Геозоны включены' : '📍 Геозоны выключены'}</button>
+          <button onClick={handleGeoClick} style={{ height: '28px', padding: '0 14px', borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center' }}>{geoEnabled ? '📍 Геозоны вкл' : '📍 Геозоны выкл'}</button>
         </div>
 
-        {/* Карусель групп или адресов */}
+        {/* Карусель */}
         {mounted && !showAddresses && (
-          <GroupList groups={groups} activeTags={activeTags} onGroupClick={handleGroupClick} onEditGroup={handleEditGroup} />
+          <GroupList
+            groups={allGroups}
+            activeTags={activeTags}
+            onGroupClick={handleGroupClick}
+            onEditGroup={handleEditGroup}
+          />
         )}
         {mounted && showAddresses && (
-          <AddressList tags={locationTags} activeTagId={locationTagFilter} onAddressClick={handleAddressClick} onEdit={handleEditAddress} />
+          <AddressList
+            tags={locationTags}
+            activeTagId={locationTagFilter}
+            onAddressClick={handleAddressClick}
+            onEdit={handleEditAddress}
+          />
         )}
 
-        {/* Переключатель Знания / Дела */}
+        {/* Знания/Дела */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px', gap: '10px' }}>
           <div style={{ display: 'inline-flex', borderRadius: '20px', border: '1px solid #859c5e', overflow: 'hidden' }}>
             <button onClick={() => setNoteTypeFilter(noteTypeFilter === 'note' ? 'all' : 'note')} style={{ padding: '4px 12px', border: 'none', background: noteTypeFilter === 'note' ? '#859c5e' : 'transparent', color: noteTypeFilter === 'note' ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>📝 Знания</button>
@@ -263,7 +334,7 @@ function App() {
 
         <hr style={{ margin: '10px -20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
 
-        {/* Кнопка и форма добавления заметки */}
+        {/* Форма */}
         <div style={{ textAlign: 'center', margin: '10px 0' }}>
           <button onClick={() => setIsFormOpen(!isFormOpen)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #ccc' }}>{isFormOpen ? '▲ Свернуть' : '▼ Добавить заметку'}</button>
         </div>
@@ -273,19 +344,16 @@ function App() {
 
         <hr style={{ margin: '10px -20px', width: 'calc(100% + 40px)', border: 'none', borderTop: '1px solid #ccc' }} />
 
-        {/* Список заметок */}
+        {/* Заметки */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {filteredNotes.map(note => (
             <NoteCard key={note.id} note={note} onDelete={handleDeleteNote} onUpdate={handleUpdateNote} onTagClick={handleTagToggle} locationTags={locationTags} />
           ))}
         </div>
 
-        {/* Модалка адреса */}
         {editingAddress !== undefined && (
           <AddressFormModal initial={editingAddress} onSave={handleSaveAddress} onClose={() => setEditingAddress(undefined)} onDelete={handleDeleteAddress} />
         )}
-
-        {/* Модалка группы */}
         {editingGroup && (
           <EditGroupModal group={editingGroup} onSave={handleSaveGroup} onClose={() => setEditingGroup(null)} />
         )}
@@ -293,5 +361,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

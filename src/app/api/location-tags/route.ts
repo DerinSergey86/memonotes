@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       longitude: longitude || null,
       radius: Number(radius) || 50,
       userId: session.user.id,
+      image: body.image || null,
     },
   });
 
@@ -72,6 +73,7 @@ export async function PUT(request: Request) {
       latitude: latitude ?? existing.latitude,
       longitude: longitude ?? existing.longitude,
       radius: radius ?? existing.radius,
+      image: body.image || null,
     },
   });
 

@@ -19,7 +19,7 @@ export default function AddressList({ tags, activeTagId, onAddressClick, onEdit 
   };
 
   return (
-    <div style={{ minHeight: '120px' }}>
+    <div style={{ minHeight: '140px' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <button className="scroll-button" onClick={() => scroll('left')}>❮</button>
         <div
@@ -31,7 +31,13 @@ export default function AddressList({ tags, activeTagId, onAddressClick, onEdit 
           style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '10px 0', cursor: 'grab', userSelect: 'none', flex: 1 }}
         >
           {tags.map(tag => (
-            <AddressCard key={tag.id} tag={tag} isActive={activeTagId === tag.id} onClick={onAddressClick} onEdit={onEdit} />
+            <AddressCard
+              key={tag.id}
+              tag={tag}
+              isActive={activeTagId === tag.id}
+              onClick={onAddressClick}
+              onEdit={onEdit}
+            />
           ))}
         </div>
         <button className="scroll-button" onClick={() => scroll('right')}>❯</button>

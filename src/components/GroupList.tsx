@@ -22,7 +22,7 @@ export default function GroupList({ groups, activeTags, onGroupClick, onEditGrou
   };
 
   return (
-    <div style={{ minHeight: '120px' }}>  {/* фиксируем высоту, чтобы не прыгало */}
+    <div style={{ minHeight: '140px' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <button className="scroll-button" onClick={() => scroll('left')}>❮</button>
         <div
@@ -45,7 +45,13 @@ export default function GroupList({ groups, activeTags, onGroupClick, onEditGrou
             <GroupCard
               key={group.id}
               group={group}
-              isActive={group.tags.some(tag => activeTags.includes(tag))}
+              isActive={
+                group.id === 'no-tags'
+                  ? activeTags.includes('__no_tags__')
+                  : group.id === 'ungrouped'
+                    ? false
+                    : group.tags.some(tag => activeTags.includes(tag))
+              }
               onClick={onGroupClick}
               onEdit={onEditGroup}
               isDragging={isDragging}

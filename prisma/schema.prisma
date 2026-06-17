@@ -18,7 +18,7 @@ model Note {
   id                  String   @id @default(uuid())
   title               String
   content             String
-  tags                String   // JSON-массив строк
+  tags                String
   type                String   @default("note")
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -37,6 +37,7 @@ model LocationTag {
   id        String  @id @default(uuid())
   name      String
   address   String
+  image     String?
   latitude  Float?
   longitude Float?
   radius    Float?  @default(50)

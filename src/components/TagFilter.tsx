@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 interface TagFilterProps {
   allTags: string[];
@@ -10,24 +10,30 @@ interface TagFilterProps {
   onSearchChange: (q: string) => void;
   strictFilter: boolean;
   onStrictFilterToggle: () => void;
+  focusedGroupTags: string[] | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export default function TagFilter({ allTags, activeTags, onTagToggle, searchQuery, onSearchChange, strictFilter, onStrictFilterToggle }: TagFilterProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function TagFilter({
+  allTags, activeTags, onTagToggle, searchQuery, onSearchChange,
+  strictFilter, onStrictFilterToggle, focusedGroupTags, isOpen, onOpenChange
+}: TagFilterProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const filteredTags = allTags.filter(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+        onOpenChange(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [onOpenChange]);
+
+  const tagsToShow = focusedGroupTags ? focusedGroupTags : allTags;
+  const filteredTags = tagsToShow.filter(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div ref={containerRef} style={{ position: 'relative', marginBottom: '16px' }}>
@@ -38,8 +44,8 @@ export default function TagFilter({ allTags, activeTags, onTagToggle, searchQuer
             type="text"
             placeholder="Поиск по тегам или заметкам..."
             value={searchQuery}
-            onChange={e => { onSearchChange(e.target.value); if (!isOpen) setIsOpen(true); }}
-            onFocus={() => setIsOpen(true)}
+            onChange={e => { onSearchChange(e.target.value); if (!isOpen) onOpenChange(true); }}
+            onFocus={() => { if (!isOpen) onOpenChange(true); }}
             style={{ width: '100%', padding: '8px 32px 8px 8px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '14px', boxSizing: 'border-box' }}
           />
           {searchQuery && (
@@ -48,16 +54,17 @@ export default function TagFilter({ allTags, activeTags, onTagToggle, searchQuer
             </button>
           )}
         </div>
-        <button onClick={onStrictFilterToggle} style={{ padding: '4px 10px', borderRadius: '20px', border: '1px solid #859c5e', background: strictFilter ? '#859c5e' : 'transparent', color: strictFilter ? 'white' : '#859c5e', fontSize: '14px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-          {strictFilter ? 'Только' : 'Включающие'}
-        </button>
+        <div style={{ display: 'inline-flex', borderRadius: '20px', overflow: 'hidden', border: '1px solid #859c5e' }}>
+          <button onClick={() => onStrictFilterToggle()} style={{ padding: '4px 12px', border: 'none', background: !strictFilter ? '#859c5e' : 'transparent', color: !strictFilter ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>Любой</button>
+          <button onClick={() => onStrictFilterToggle()} style={{ padding: '4px 12px', border: 'none', background: strictFilter ? '#859c5e' : 'transparent', color: strictFilter ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>Только</button>
+        </div>
       </div>
 
       {activeTags.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
           {activeTags.map(tag => (
             <span key={tag} style={{ background: '#859c5e', color: 'white', padding: '4px 8px', borderRadius: '16px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              {tag}
+              {tag === '__no_tags__' ? 'Без тегов' : tag}
               <button onClick={() => onTagToggle(tag)} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold', padding: '0 2px' }}>×</button>
             </span>
           ))}

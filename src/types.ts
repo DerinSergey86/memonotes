@@ -1,4 +1,3 @@
-// src/types.ts
 export interface Note {
   id: string;
   title: string;
@@ -18,15 +17,16 @@ export interface Note {
 
 export interface Group {
   id: string;
-  name: string;         // основной тег (название группы)
-  image: string;        // картинка мема
-  tags: string[];       // связанные теги (основной дублируется первым элементом для удобства, но можно просто включать основной)
+  name: string;
+  image: string;
+  tags: string[];
 }
 
 export interface LocationTag {
   id: string;
   name: string;
   address: string;
+  image?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   radius?: number | null;
