@@ -1,28 +1,26 @@
+// src/types.ts
 export interface Note {
   id: string;
   title: string;
   content: string;
   tags: string[];
-  type: 'note' | 'task';         // ← новое
+  type: 'note' | 'task';
   createdAt: string;
-  updatedAt?: string;             // ← опционально
-  dueDate?: string | null;        // ← опционально
-  completed?: boolean;            // ← опционально
+  updatedAt?: string;
+  dueDate?: string | null;
+  completed?: boolean;
   latitude?: number | null;
   longitude?: number | null;
   location?: string | null;
-  locationTagIds?: string[];
-  notifyOnEnter?: boolean;
-notifyOnExit?: boolean;
-enterLocationTagIds?: string[];
+  enterLocationTagIds?: string[];
   exitLocationTagIds?: string[];
 }
 
 export interface Group {
   id: string;
-  name: string;        
-  image: string;       
-  tags: string[];      
+  name: string;         // основной тег (название группы)
+  image: string;        // картинка мема
+  tags: string[];       // связанные теги (основной дублируется первым элементом для удобства, но можно просто включать основной)
 }
 
 export interface LocationTag {

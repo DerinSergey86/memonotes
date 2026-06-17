@@ -1,6 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
+// src/components/EditGroupModal.tsx
+'use client';
+
 import { useState } from 'react';
-import { type Group } from '../types';
+import { type Group } from '@/types';
 
 interface EditGroupModalProps {
   group: Group;
@@ -8,52 +10,28 @@ interface EditGroupModalProps {
   onClose: () => void;
 }
 
-function EditGroupModal({ group, onSave, onClose }: EditGroupModalProps) {
+export default function EditGroupModal({ group, onSave, onClose }: EditGroupModalProps) {
   const [name, setName] = useState(group.name);
-  const [tagsString, setTagsString] = useState(group.tags.join(', '));
-  const [imagePreview, setImagePreview] = useState<string>(group.image);
+  const [tagsString, setTagsString] = useState(group.tags.slice(1).join(', ')); // все теги, кроме основного (первого)
+  const [image, setImage] = useState(group.image);
   const [error, setError] = useState('');
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Проверяем, что это изображение
-    if (!file.type.startsWith('image/')) {
-      setError('Пожалуйста, выберите изображение');
-      return;
-    }
-
-    // Читаем файл как data URL
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImagePreview(reader.result as string);
-      setError('');
-    };
-    reader.onerror = () => {
-      setError('Не удалось прочитать файл');
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!name.trim()) {
       setError('Название группы не может быть пустым');
       return;
     }
-
+    const relatedTags = tagsString
+      .split(',')
+      .map(t => t.trim())
+      .filter(t => t !== '');
     const updatedGroup: Group = {
       ...group,
       name: name.trim(),
-      image: imagePreview,
-      tags: tagsString
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag !== ''),
+      image: image,
+      tags: [name.trim().toLowerCase(), ...relatedTags.map(t => t.toLowerCase())],
     };
-
     onSave(updatedGroup);
   };
 
@@ -75,11 +53,11 @@ function EditGroupModal({ group, onSave, onClose }: EditGroupModalProps) {
         maxWidth: '400px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
       }}>
-        <h3>Редактирование группы</h3>
+        <h3>{group.id ? 'Редактирование группы' : 'Новая группа'}</h3>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '12px' }}>
-            <label>Название:</label>
+            <label>Название (основной тег):</label>
             <input
               type="text"
               value={name}
@@ -87,9 +65,8 @@ function EditGroupModal({ group, onSave, onClose }: EditGroupModalProps) {
               style={{ width: '100%', marginTop: '4px' }}
             />
           </div>
-
           <div style={{ marginBottom: '12px' }}>
-            <label>Теги (через запятую):</label>
+            <label>Связанные теги (через запятую):</label>
             <input
               type="text"
               value={tagsString}
@@ -97,42 +74,21 @@ function EditGroupModal({ group, onSave, onClose }: EditGroupModalProps) {
               style={{ width: '100%', marginTop: '4px' }}
             />
           </div>
-
           <div style={{ marginBottom: '12px' }}>
-            <label>Картинка:</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
-              <img
-                src={imagePreview}
-                alt="Превью"
-                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ccc' }}
-              />
-              <label style={{ 
-  padding: '6px 14px', 
-  cursor: 'pointer', 
-  background: '#f0f0f0', 
-  border: '1px solid #ccc', 
-  borderRadius: '4px',
-  fontSize: '14px',
-}}>
-  Выберите файл
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleFileChange}
-    style={{ display: 'none' }}
-  />
-</label>
-            </div>
+            <label>URL картинки:</label>
+            <input
+              type="text"
+              value={image}
+              onChange={e => setImage(e.target.value)}
+              style={{ width: '100%', marginTop: '4px' }}
+            />
           </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px',  }}>
-            <button type="button" onClick={onClose} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Отмена</button>
-            <button type="submit" style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Сохранить</button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <button type="button" onClick={onClose} style={{ padding: '6px 14px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff' }}>Отмена</button>
+            <button type="submit" style={{ padding: '6px 14px', borderRadius: '4px', background: '#859c5e', color: 'white', border: 'none' }}>Сохранить</button>
           </div>
         </form>
       </div>
     </div>
   );
 }
-
-export default EditGroupModal;

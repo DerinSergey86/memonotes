@@ -1,26 +1,24 @@
 /* eslint-disable @next/next/no-img-element */
+// src/components/GroupCard.tsx
 import { type Group } from '@/types';
 
 interface GroupCardProps {
   group: Group;
+  isActive: boolean;
   onClick: (group: Group) => void;
   onEdit: (group: Group) => void;
   isDragging: boolean;
-  isActive: boolean;
 }
 
-function GroupCard({ group, onClick, onEdit, isDragging, isActive }: GroupCardProps) {
+export default function GroupCard({ group, isActive, onClick, onEdit, isDragging }: GroupCardProps) {
   const handleClick = () => {
-    if (!isDragging) {
-      onClick(group);
-    }
+    if (!isDragging) onClick(group);
   };
 
- return (
+  return (
     <div
       onClick={handleClick}
       style={{
-        cursor: 'pointer',
         border: `2px solid ${isActive ? '#859c5e' : '#ccc'}`,
         borderRadius: '8px',
         overflow: 'hidden',
@@ -28,18 +26,12 @@ function GroupCard({ group, onClick, onEdit, isDragging, isActive }: GroupCardPr
         flexShrink: 0,
         textAlign: 'center',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        cursor: 'pointer',
         transition: 'transform 0.2s, border-color 0.2s',
+        transform: isActive ? 'scale(1.05)' : 'scale(1)',
         position: 'relative',
-        transform: isActive ? 'scale(1.08)' : 'scale(1)',  // начальный масштаб
-      }}
-      onMouseEnter={(e) => {
-        if (!isActive) e.currentTarget.style.transform = 'scale(1.05)';
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive) e.currentTarget.style.transform = 'scale(1)';
       }}
     >
-      {/* Кнопка редактирования */}
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -64,8 +56,6 @@ function GroupCard({ group, onClick, onEdit, isDragging, isActive }: GroupCardPr
       >
         ✎
       </button>
-
-
       <img
         src={group.image}
         alt={group.name}
@@ -77,5 +67,3 @@ function GroupCard({ group, onClick, onEdit, isDragging, isActive }: GroupCardPr
     </div>
   );
 }
-
-export default GroupCard;
