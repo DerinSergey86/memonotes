@@ -55,7 +55,7 @@ export default function TagFilter({
           )}
         </div>
         <div style={{ display: 'inline-flex', borderRadius: '20px', overflow: 'hidden', border: '1px solid #859c5e' }}>
-          <button onClick={() => onStrictFilterToggle()} style={{ padding: '4px 12px', border: 'none', background: !strictFilter ? '#859c5e' : 'transparent', color: !strictFilter ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>Любой</button>
+          <button onClick={() => onStrictFilterToggle()} style={{ padding: '4px 12px', border: 'none', background: !strictFilter ? '#859c5e' : 'transparent', color: !strictFilter ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>Включающие</button>
           <button onClick={() => onStrictFilterToggle()} style={{ padding: '4px 12px', border: 'none', background: strictFilter ? '#859c5e' : 'transparent', color: strictFilter ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>Только</button>
         </div>
       </div>

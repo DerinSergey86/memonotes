@@ -17,7 +17,7 @@ export async function GET() {
   return NextResponse.json(tags);
 }
 
-// POST 
+// POST /api/location-tags
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, address, latitude, longitude, radius } = body;
+  const { name, address, latitude, longitude, radius, image } = body;
 
   if (!name || !address) {
     return NextResponse.json({ error: 'Название и адрес обязательны' }, { status: 400 });
@@ -38,15 +38,15 @@ export async function POST(request: Request) {
       latitude: latitude || null,
       longitude: longitude || null,
       radius: Number(radius) || 50,
+      image: image || null,   // ← здесь была опечатка (null?)
       userId: session.user.id,
-      image: body.image || null,
     },
   });
 
   return NextResponse.json(tag, { status: 201 });
 }
 
-// PUT 
+// PUT /api/location-tags
 export async function PUT(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -54,7 +54,7 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const { id, name, address, latitude, longitude, radius } = body;
+  const { id, name, address, latitude, longitude, radius, image } = body;
 
   if (!id || !name || !address) {
     return NextResponse.json({ error: 'ID, название и адрес обязательны' }, { status: 400 });
@@ -73,7 +73,7 @@ export async function PUT(request: Request) {
       latitude: latitude ?? existing.latitude,
       longitude: longitude ?? existing.longitude,
       radius: radius ?? existing.radius,
-      image: body.image || null,
+      image: image !== undefined ? image : existing.image,   // ← исправлено
     },
   });
 
