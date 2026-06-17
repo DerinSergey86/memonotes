@@ -1,4 +1,3 @@
-// src/components/GroupList.tsx
 import { type Group } from '@/types';
 import GroupCard from './GroupCard';
 import { useDragScroll } from '@/hooks/useDragScroll';
@@ -8,10 +7,9 @@ interface GroupListProps {
   activeTags: string[];
   onGroupClick: (group: Group) => void;
   onEditGroup: (group: Group) => void;
-  onAddGroup: () => void;
 }
 
-export default function GroupList({ groups, activeTags, onGroupClick, onEditGroup, onAddGroup }: GroupListProps) {
+export default function GroupList({ groups, activeTags, onGroupClick, onEditGroup }: GroupListProps) {
   const { ref, isDragging, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
   const scroll = (direction: 'left' | 'right') => {
@@ -24,7 +22,7 @@ export default function GroupList({ groups, activeTags, onGroupClick, onEditGrou
   };
 
   return (
-    <div>
+    <div style={{ minHeight: '120px' }}>  {/* фиксируем высоту, чтобы не прыгало */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <button className="scroll-button" onClick={() => scroll('left')}>❮</button>
         <div
@@ -55,17 +53,6 @@ export default function GroupList({ groups, activeTags, onGroupClick, onEditGrou
           ))}
         </div>
         <button className="scroll-button" onClick={() => scroll('right')}>❯</button>
-      </div>
-      {/* Кнопка добавления группы */}
-      <div style={{ textAlign: 'center', marginTop: '8px' }}>
-        <button onClick={onAddGroup} style={{
-          width: '28px', height: '28px', borderRadius: '50%',
-          background: '#859c5e', color: 'white', border: 'none',
-          cursor: 'pointer', fontSize: '18px',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
-        }}>
-          ＋
-        </button>
       </div>
     </div>
   );

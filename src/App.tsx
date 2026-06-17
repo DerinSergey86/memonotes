@@ -36,7 +36,6 @@ function App() {
   const [pendingLocationList, setPendingLocationList] = useState<'enter' | 'exit' | null>(null);
   const [autoAddTag, setAutoAddTag] = useState<{ listType: 'enter' | 'exit'; tagId: string } | null>(null);
 
-  // ---------- группы ----------
   const [groups, setGroups] = useState<Group[]>([
     { id: '1', name: 'Семья', image: '/images/family.png', tags: ['семья'] },
     { id: '2', name: 'Работа', image: '/images/work.png', tags: ['работа'] },
@@ -76,7 +75,6 @@ function App() {
     }
     setEditingGroup(null);
   };
-  // ----------------------------
 
   const allTags = useAllTags(notes);
   const { startWatching, stopWatching } = useGeofencing({ locationTags, notes, enabled: geoEnabled });
@@ -227,22 +225,32 @@ function App() {
           </div>
         </div>
 
-        {/* Фильтр */}
+        {/* Фильтр тегов */}
         <TagFilter allTags={allTags} activeTags={activeTags} onTagToggle={handleTagToggle} searchQuery={searchQuery} onSearchChange={setSearchQuery} strictFilter={strictFilter} onStrictFilterToggle={() => setStrictFilter(!strictFilter)} />
 
-        {/* Переключатель Группы / Адреса + геозоны */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
-          <button onClick={() => setShowAddresses(false)} style={{ padding: '6px 14px', borderRadius: '20px', border: '1px solid #859c5e', background: !showAddresses ? '#859c5e' : '#f0f0f0', color: !showAddresses ? 'white' : '#333', cursor: 'pointer', fontSize: '14px' }}>🏷️ Группы</button>
-          <button onClick={() => setShowAddresses(true)} style={{ padding: '6px 14px', borderRadius: '20px', border: '1px solid #859c5e', background: showAddresses ? '#859c5e' : '#f0f0f0', color: showAddresses ? 'white' : '#333', cursor: 'pointer', fontSize: '14px' }}>🗺️ Адреса</button>
-          <button onClick={handleGeoClick} style={{ height: '28px', padding: '0 14px', borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center' }}>{geoEnabled ? '📍 Геозоны вкл' : '📍 Геозоны выкл'}</button>
+        {/* Переключатель Группы / Адреса + кнопка добавления + геозоны */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'inline-flex', borderRadius: '20px', overflow: 'hidden', border: '1px solid #859c5e' }}>
+            <button onClick={() => setShowAddresses(false)} style={{ padding: '4px 12px', border: 'none', background: !showAddresses ? '#859c5e' : 'transparent', color: !showAddresses ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>🏷️ Группы</button>
+            <button onClick={() => setShowAddresses(true)} style={{ padding: '4px 12px', border: 'none', background: showAddresses ? '#859c5e' : 'transparent', color: showAddresses ? 'white' : '#859c5e', cursor: 'pointer', fontSize: '14px' }}>🗺️ Адреса</button>
+          </div>
+          <button onClick={showAddresses ? handleAddAddress : handleAddGroup} style={{
+            width: '28px', height: '28px', borderRadius: '50%',
+            background: '#859c5e', color: 'white', border: 'none',
+            cursor: 'pointer', fontSize: '18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            ＋
+          </button>
+          <button onClick={handleGeoClick} style={{ height: '28px', padding: '0 14px', borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center' }}>{geoEnabled ? '📍 Геозоны включены' : '📍 Геозоны выключены'}</button>
         </div>
 
         {/* Карусель групп или адресов */}
         {mounted && !showAddresses && (
-          <GroupList groups={groups} activeTags={activeTags} onGroupClick={handleGroupClick} onEditGroup={handleEditGroup} onAddGroup={handleAddGroup} />
+          <GroupList groups={groups} activeTags={activeTags} onGroupClick={handleGroupClick} onEditGroup={handleEditGroup} />
         )}
         {mounted && showAddresses && (
-          <AddressList tags={locationTags} activeTagId={locationTagFilter} onAddressClick={handleAddressClick} onEdit={handleEditAddress} onAdd={handleAddAddress} />
+          <AddressList tags={locationTags} activeTagId={locationTagFilter} onAddressClick={handleAddressClick} onEdit={handleEditAddress} />
         )}
 
         {/* Переключатель Знания / Дела */}

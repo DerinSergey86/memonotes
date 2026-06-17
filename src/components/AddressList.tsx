@@ -8,10 +8,9 @@ interface AddressListProps {
   activeTagId: string | null;
   onAddressClick: (tagId: string) => void;
   onEdit: (tag: LocationTag) => void;
-  onAdd: () => void;
 }
 
-export default function AddressList({ tags, activeTagId, onAddressClick, onEdit, onAdd }: AddressListProps) {
+export default function AddressList({ tags, activeTagId, onAddressClick, onEdit }: AddressListProps) {
   const { ref, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
   const scroll = (dir: 'left' | 'right') => {
@@ -20,7 +19,7 @@ export default function AddressList({ tags, activeTagId, onAddressClick, onEdit,
   };
 
   return (
-    <div style={{ marginBottom: '10px' }}>
+    <div style={{ minHeight: '120px' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <button className="scroll-button" onClick={() => scroll('left')}>❮</button>
         <div
@@ -36,16 +35,6 @@ export default function AddressList({ tags, activeTagId, onAddressClick, onEdit,
           ))}
         </div>
         <button className="scroll-button" onClick={() => scroll('right')}>❯</button>
-      </div>
-      <div style={{ textAlign: 'center', marginTop: '8px' }}>
-        <button onClick={onAdd} style={{
-          width: '28px', height: '28px', borderRadius: '50%',
-          background: '#859c5e', color: 'white', border: 'none',
-          cursor: 'pointer', fontSize: '18px',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
-        }}>
-          ＋
-        </button>
       </div>
     </div>
   );
