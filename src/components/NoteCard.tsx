@@ -7,13 +7,15 @@ interface NoteCardProps {
   onUpdate: (updatedNote: Note) => void;
   onTagClick: (tag: string) => void;
   locationTags: LocationTag[];
+  allTags: string[];  // ← новый пропс для подсказок
 }
 
-function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCardProps) {
+function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags }: NoteCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(note.title);
   const [editContent, setEditContent] = useState(note.content);
-  const [editTags, setEditTags] = useState(note.tags.join(', '));
+  const [editTags, setEditTags] = useState<string[]>(note.tags || []);
+  const [editInputTag, setEditInputTag] = useState('');
   const [editEnterLocationTagIds, setEditEnterLocationTagIds] = useState<string[]>(note.enterLocationTagIds || []);
   const [editExitLocationTagIds, setEditExitLocationTagIds] = useState<string[]>(note.exitLocationTagIds || []);
   const [enterInput, setEnterInput] = useState('');
@@ -22,9 +24,10 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
   const handleStartEditing = () => {
     setEditTitle(note.title);
     setEditContent(note.content);
-    setEditTags(note.tags.join(', '));
+    setEditTags(note.tags || []);
     setEditEnterLocationTagIds(note.enterLocationTagIds || []);
     setEditExitLocationTagIds(note.exitLocationTagIds || []);
+    setEditInputTag('');
     setIsEditing(true);
   };
 
@@ -32,21 +35,16 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
     setIsEditing(false);
   };
 
-  const handleSave = () => {
-    if (!editTitle.trim() || !editContent.trim()) return;
+  const handleAddEditTag = () => {
+    const trimmed = editInputTag.trim().toLowerCase();
+    if (trimmed && !editTags.includes(trimmed)) {
+      setEditTags(prev => [...prev, trimmed]);
+    }
+    setEditInputTag('');
+  };
 
-    const updatedNote: Note = {
-      ...note,
-      title: editTitle.trim(),
-      content: editContent.trim(),
-      tags: editTags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
-      type: note.type,
-      enterLocationTagIds: editEnterLocationTagIds,
-      exitLocationTagIds: editExitLocationTagIds,
-    };
-
-    onUpdate(updatedNote);
-    setIsEditing(false);
+  const handleRemoveEditTag = (tag: string) => {
+    setEditTags(prev => prev.filter(t => t !== tag));
   };
 
   const handleAddEnterTag = () => {
@@ -69,6 +67,23 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
     setExitInput('');
   };
 
+  const handleSave = () => {
+    if (!editTitle.trim() || !editContent.trim()) return;
+
+    const updatedNote: Note = {
+      ...note,
+      title: editTitle.trim(),
+      content: editContent.trim(),
+      tags: editTags,
+      type: note.type,
+      enterLocationTagIds: editEnterLocationTagIds,
+      exitLocationTagIds: editExitLocationTagIds,
+    };
+
+    onUpdate(updatedNote);
+    setIsEditing(false);
+  };
+
   if (!isEditing) {
     return (
       <div style={{
@@ -85,7 +100,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
         <h3 style={{ margin: '1em 0' }}>{note.title}</h3>
         <p>{note.content}</p>
         <div>
-          {note.tags.map((tag) => (
+          {note.tags?.map((tag) => (
             <button
               key={tag}
               onClick={() => onTagClick(tag)}
@@ -157,10 +172,69 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
       boxSizing: 'border-box',
       textAlign: 'center'
     }}>
-      <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} style={{ width: '100%', marginBottom: '8px', fontWeight: 'bold' }} placeholder="Заголовок" />
-      <textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={4} style={{ width: '100%', marginBottom: '8px' }} placeholder="Содержание" />
-      <input type="text" value={editTags} onChange={e => setEditTags(e.target.value)} style={{ width: '100%', marginBottom: '8px' }} placeholder="Теги через запятую" />
+      <input
+        type="text"
+        value={editTitle}
+        onChange={(e) => setEditTitle(e.target.value)}
+        style={{ width: '100%', marginBottom: '8px', fontWeight: 'bold' }}
+        placeholder="Заголовок"
+      />
+      <textarea
+        value={editContent}
+        onChange={(e) => setEditContent(e.target.value)}
+        rows={4}
+        style={{ width: '100%', marginBottom: '8px' }}
+        placeholder="Содержание"
+      />
 
+      {/* Редактирование тегов как в форме создания */}
+      <div style={{ marginBottom: '8px' }}>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '4px' }}>
+          {editTags.map(tag => (
+            <span key={tag} style={{
+              background: '#859c5e',
+              color: 'white',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontSize: '14px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              {tag}
+              <button
+                type="button"
+                onClick={() => handleRemoveEditTag(tag)}
+                style={{
+                  background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold',
+                  borderRadius: '8px'
+                }}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <input
+            type="text"
+            placeholder="Добавить тег"
+            value={editInputTag}
+            onChange={(e) => setEditInputTag(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddEditTag(); } }}
+            list="edit-tags-list"
+            style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
+          />
+          <datalist id="edit-tags-list">
+            {allTags.map(tag => (
+              <option key={tag} value={tag} />
+            ))}
+          </datalist>
+          <button type="button" onClick={handleAddEditTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+        </div>
+      </div>
+
+      {/* Геометки (только для задач) */}
       {note.type === 'task' && (
         <>
           <div style={{ marginBottom: '8px', textAlign: 'left' }}>
@@ -177,7 +251,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
               })}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input type="text" placeholder="Добавить метку" value={enterInput} onChange={e => setEnterInput(e.target.value)} list="edit-enter-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <input type="text" placeholder="Добавить метку" value={enterInput} onChange={e => setEnterInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddEnterTag(); } }} list="edit-enter-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
               <datalist id="edit-enter-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
@@ -199,7 +273,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags }: NoteCa
               })}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input type="text" placeholder="Добавить метку" value={exitInput} onChange={e => setExitInput(e.target.value)} list="edit-exit-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <input type="text" placeholder="Добавить метку" value={exitInput} onChange={e => setExitInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddExitTag(); } }} list="edit-exit-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
               <datalist id="edit-exit-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>

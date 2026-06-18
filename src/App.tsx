@@ -357,7 +357,13 @@ export default function App() {
         {/* Заметки */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {filteredNotes.map(note => (
-            <NoteCard key={note.id} note={note} onDelete={handleDeleteNote} onUpdate={handleUpdateNote} onTagClick={handleTagToggle} locationTags={locationTags} />
+            <NoteCard key={note.id} 
+            note={note} 
+            onDelete={handleDeleteNote} 
+            onUpdate={handleUpdateNote} 
+            onTagClick={handleTagToggle} 
+            locationTags={locationTags}
+            allTags={allTags} />
           ))}
         </div>
 
