@@ -371,7 +371,11 @@ export default function App() {
           <AddressFormModal initial={editingAddress} onSave={handleSaveAddress} onClose={() => setEditingAddress(undefined)} onDelete={handleDeleteAddress} />
         )}
         {editingGroup && (
-          <EditGroupModal group={editingGroup} onSave={handleSaveGroup} onClose={() => setEditingGroup(null)} />
+          <EditGroupModal 
+          group={editingGroup} 
+          onSave={handleSaveGroup} 
+          onClose={() => setEditingGroup(null)} 
+          allTags={allTags} />
         )}
       </div>
     </div>
