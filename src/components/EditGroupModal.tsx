@@ -8,15 +8,13 @@ interface EditGroupModalProps {
   group: Group;
   onSave: (updatedGroup: Group) => void;
   onClose: () => void;
-  allTags: string[];   // ← новый пропс
+  allTags: string[];
 }
 
 export default function EditGroupModal({ group, onSave, onClose, allTags }: EditGroupModalProps) {
-  // Основной тег (название)
   const [name, setName] = useState(group.name);
-  // Связанные теги (те, что идут после основного)
   const [relatedTags, setRelatedTags] = useState<string[]>(
-    group.tags.slice(1) // все кроме первого (основного)
+    group.tags.slice(1)
   );
   const [inputTag, setInputTag] = useState('');
   const [image, setImage] = useState(group.image);
@@ -89,7 +87,7 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
             />
           </div>
 
-          {/* Связанные теги — как в заметках */}
+          {/* Связанные теги */}
           <div style={{ marginBottom: '12px' }}>
             <label>Связанные теги:</label>
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '4px', marginTop: '4px' }}>
@@ -165,17 +163,23 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
               style={{ marginTop: '4px' }}
             />
             {image && (
-              <img
-                src={image}
-                alt="preview"
-                style={{
-                  width: '100%',
-                  height: '80px',
-                  objectFit: 'cover',
-                  marginTop: '4px',
-                  borderRadius: '4px'
-                }}
-              />
+              <div style={{
+                width: '360px',
+                height: '360px',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                marginTop: '8px'
+              }}>
+                <img
+                  src={image}
+                  alt="preview"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
             )}
           </div>
 
