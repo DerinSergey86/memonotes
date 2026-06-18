@@ -52,7 +52,7 @@ export default function App() {
   ]);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 
-  const allTags = useAllTags(notes);
+  const allTags = useAllTags(notes, groups);
   const { startWatching, stopWatching } = useGeofencing({ locationTags, notes, enabled: geoEnabled });
 
   const noTagsGroup = useMemo<Group>(() => ({ id: 'no-tags', name: 'Без тегов', image: '/images/no-tags.png', tags: [] }), []);
@@ -68,7 +68,7 @@ export default function App() {
   const handleGroupClick = (group: Group) => {
     if (group.id === 'no-tags') {
       setActiveTags(['__no_tags__']);
-      setStrictFilter(true);
+      setStrictFilter(true);   // для "без тегов" оставляем строгий режим
       setFocusedGroupId(null);
       setFilterOpen(false);
       return;
@@ -80,14 +80,16 @@ export default function App() {
       setFilterOpen(true);
       return;
     }
+    // Обычная группа – переключаем в нестрогий режим
     const mainTag = group.name.toLowerCase();
-    if (activeTags.includes(mainTag) && strictFilter) {
+    if (activeTags.includes(mainTag)) {
+      // Повторный клик – сброс
       setActiveTags([]);
       setStrictFilter(false);
       setFocusedGroupId(null);
     } else {
       setActiveTags([mainTag]);
-      setStrictFilter(true);
+      setStrictFilter(false);   // ← теперь НЕ строгий режим
       setFocusedGroupId(group.id);
     }
     setFilterOpen(false);
@@ -139,8 +141,16 @@ export default function App() {
       result = result.filter(note => !note.tags || note.tags.length === 0);
     } else if (activeTags.length > 0) {
       result = result.filter(note => {
-        if (strictFilter) return activeTags.every(tag => note.tags?.includes(tag));
-        return activeTags.some(tag => note.tags?.includes(tag));
+        if (strictFilter) {
+          // Точное совпадение: заметка должна содержать ровно выбранные теги и никаких других
+          return (
+            note.tags?.length === activeTags.length &&
+            activeTags.every(tag => note.tags?.includes(tag))
+          );
+        } else {
+          // Нестрогий: хотя бы один из выбранных тегов присутствует
+          return activeTags.some(tag => note.tags?.includes(tag));
+        }
       });
     }
     if (searchQuery.trim()) {
@@ -211,7 +221,7 @@ export default function App() {
     setEditingAddress(null);
   };
 
-  const handleSaveAddress = async (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null; image?: string }) => {
+  const handleSaveAddress = async (data: { name: string; address?: string; radius: number; latitude: number | null; longitude: number | null; image?: string }) => {
     const url = '/api/location-tags';
     const method = editingAddress ? 'PUT' : 'POST';
     const body = editingAddress ? { id: editingAddress.id, ...data } : data;
