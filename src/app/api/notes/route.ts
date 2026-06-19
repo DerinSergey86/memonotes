@@ -4,7 +4,9 @@ import { auth } from '@/auth';
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  }
 
   const notes = await prisma.note.findMany({
     where: { userId: session.user.id },
@@ -23,7 +25,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  }
 
   const body = await request.json();
   const note = await prisma.note.create({
@@ -55,11 +59,15 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  }
 
   const { id } = await request.json();
   const note = await prisma.note.findUnique({ where: { id } });
-  if (!note || note.userId !== session.user.id) return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
+  if (!note || note.userId !== session.user.id) {
+    return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
+  }
 
   await prisma.note.delete({ where: { id } });
   return NextResponse.json({ success: true });
@@ -67,11 +75,15 @@ export async function DELETE(request: Request) {
 
 export async function PUT(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+  }
 
   const body = await request.json();
   const existingNote = await prisma.note.findUnique({ where: { id: body.id } });
-  if (!existingNote || existingNote.userId !== session.user.id) return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
+  if (!existingNote || existingNote.userId !== session.user.id) {
+    return NextResponse.json({ error: 'Заметка не найдена или доступ запрещён' }, { status: 404 });
+  }
 
   const note = await prisma.note.update({
     where: { id: body.id },

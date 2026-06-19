@@ -5,9 +5,10 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
+// Адаптер для Turso (libsql)
 const adapter = new PrismaLibSql({
-  url: "libsql://memonotes-derinsergey86.aws-eu-west-1.turso.io",
-  authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODA0MDEwNzksImlkIjoiMDE5ZTg4MjctZTAwMS03MjUzLTk2YmItZTc3MzJjMjhkOTY3IiwicmlkIjoiNmU2ZjAyZmItMzZhYi00ZjIyLWJkYmItYTViMWE3YjVhNTAzIn0.HoMAv-F4Qie2FHh6TuRY-kshIY4SF3kkTLzVY6D7xFIRGYH1sR5_dYkDh4P_MIVjLj7FVmEIpi1WuRTDP_nxAg",
+  url: process.env.TURSO_DATABASE_URL!,
+  authToken: process.env.TURSO_AUTH_TOKEN!,
 });
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
