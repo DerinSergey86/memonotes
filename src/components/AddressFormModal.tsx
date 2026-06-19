@@ -1,10 +1,56 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
+
 import { useState } from 'react';
 import { type LocationTag } from '@/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
 
+// Сжатие изображения перед сохранением
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxSize = 300;
+        if (width > height) {
+          if (width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('Canvas error')); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.onerror = () => reject(new Error('Image load error'));
+      img.src = reader.result as string;
+    };
+    reader.onerror = () => reject(new Error('File read error'));
+    reader.readAsDataURL(file);
+  });
+}
+
 interface AddressFormModalProps {
-  onSave: (data: { name: string; address: string; radius: number; latitude: number | null; longitude: number | null; image?: string }) => void;
+  onSave: (data: {
+    name: string;
+    address?: string;
+    radius: number;
+    latitude: number | null;
+    longitude: number | null;
+    image?: string;
+  }) => void;
   onClose: () => void;
   onDelete?: (id: string) => void;
   initial?: LocationTag | null;
@@ -19,15 +65,35 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
   const [image, setImage] = useState(initial?.image || '');
   const [localError, setLocalError] = useState('');
   const [gettingCoords, setGettingCoords] = useState(false);
+
   const { getPosition } = useGeolocation();
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImage(file);
+      setImage(compressed);
+      setLocalError('');
+    } catch {
+      setLocalError('Не удалось обработать изображение');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !address.trim()) {
-      setLocalError('Название и адрес обязательны');
+    if (!name.trim()) {
+      setLocalError('Название обязательно');
       return;
     }
-    onSave({ name: name.trim(), address: address.trim(), radius: parseFloat(radius) || 50, latitude, longitude, image: image.trim() || undefined });
+    onSave({
+      name: name.trim(),
+      address: address.trim() || undefined,   // адрес необязателен
+      radius: parseFloat(radius) || 50,
+      latitude,
+      longitude,
+      image: image.trim() || undefined,
+    });
   };
 
   return (
@@ -41,16 +107,22 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
             <input type="text" value={name} onChange={e => setName(e.target.value)} style={{ width: '100%', marginTop: '4px' }} />
           </div>
           <div style={{ marginBottom: '12px' }}>
-            <label>Адрес:</label>
-            <input type="text" value={address} onChange={e => setAddress(e.target.value)} style={{ width: '100%', marginTop: '4px' }} />
+            <label>Адрес (необязательно):</label>
+            <input type="text" value={address} onChange={e => setAddress(e.target.value)} style={{ width: '100%', marginTop: '4px' }} placeholder="ул. Пушкина, 1" />
           </div>
           <div style={{ marginBottom: '12px' }}>
             <label>Радиус (м):</label>
             <input type="number" value={radius} onChange={e => setRadius(e.target.value)} style={{ width: '100%', marginTop: '4px' }} />
           </div>
           <div style={{ marginBottom: '12px' }}>
-            <label>URL картинки:</label>
+            <label>Картинка (URL или файл):</label>
             <input type="text" value={image} onChange={e => setImage(e.target.value)} style={{ width: '100%', marginTop: '4px' }} placeholder="https://..." />
+            <input type="file" accept="image/*" onChange={handleFileChange} style={{ marginTop: '4px' }} />
+            {image && (
+              <div style={{ width: '180px', height: '180px', borderRadius: '4px', overflow: 'hidden', marginTop: '8px' }}>
+                <img src={image} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            )}
           </div>
           <button type="button" onClick={async () => {
             setGettingCoords(true);
@@ -65,7 +137,12 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
           </button>
           {latitude && longitude && (
             <div style={{ marginBottom: '12px' }}>
-              <iframe src={`https://yandex.ru/map-widget/v1/?ll=${longitude}%2C${latitude}&z=16&pt=${longitude},${latitude},pm2rdl`} width="100%" height="200" style={{ border: 0, borderRadius: '8px' }} />
+              <iframe
+                src={`https://yandex.ru/map-widget/v1/?ll=${longitude}%2C${latitude}&z=16&pt=${longitude},${latitude},pm2rdl`}
+                width="100%"
+                height="200"
+                style={{ border: 0, borderRadius: '8px' }}
+              />
               <p style={{ fontSize: '12px', color: 'green', marginTop: '4px' }}>✅ Координаты: {latitude.toFixed(6)}, {longitude.toFixed(6)}</p>
             </div>
           )}

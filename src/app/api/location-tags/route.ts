@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 
-// GET /api/location-tags
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) {
@@ -17,7 +16,6 @@ export async function GET() {
   return NextResponse.json(tags);
 }
 
-// POST /api/location-tags
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -27,26 +25,25 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { name, address, latitude, longitude, radius, image } = body;
 
-  if (!name || !address) {
-    return NextResponse.json({ error: 'Название и адрес обязательны' }, { status: 400 });
+  if (!name) {
+    return NextResponse.json({ error: 'Название обязательно' }, { status: 400 });
   }
 
   const tag = await prisma.locationTag.create({
     data: {
       name,
-      address,
+      address: address || '',   // ← пустая строка вместо null
       latitude: latitude || null,
       longitude: longitude || null,
       radius: Number(radius) || 50,
-      image: image || null,   // ← здесь была опечатка (null?)
-      userId: session.user.id,
+      image: image || '',       // тоже пустая строка, если нет картинки
+      user: { connect: { id: session.user.id } },
     },
   });
 
   return NextResponse.json(tag, { status: 201 });
 }
 
-// PUT /api/location-tags
 export async function PUT(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -56,8 +53,8 @@ export async function PUT(request: Request) {
   const body = await request.json();
   const { id, name, address, latitude, longitude, radius, image } = body;
 
-  if (!id || !name || !address) {
-    return NextResponse.json({ error: 'ID, название и адрес обязательны' }, { status: 400 });
+  if (!id || !name) {
+    return NextResponse.json({ error: 'ID и название обязательны' }, { status: 400 });
   }
 
   const existing = await prisma.locationTag.findUnique({ where: { id } });
@@ -69,18 +66,17 @@ export async function PUT(request: Request) {
     where: { id },
     data: {
       name,
-      address,
+      address: address !== undefined ? address : existing.address,
       latitude: latitude ?? existing.latitude,
       longitude: longitude ?? existing.longitude,
       radius: radius ?? existing.radius,
-      image: image !== undefined ? image : existing.image,   // ← исправлено
+      image: image !== undefined ? image : existing.image,
     },
   });
 
   return NextResponse.json(updated);
 }
 
-// DELETE /api/location-tags
 export async function DELETE(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {

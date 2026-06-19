@@ -60,7 +60,7 @@ export default function App() {
     const grouped = new Set<string>();
     groups.forEach(g => g.tags.forEach(t => grouped.add(t.toLowerCase())));
     const ungrouped = allTags.filter(t => !grouped.has(t.toLowerCase()));
-    return { id: 'ungrouped', name: 'Теги без группы', image: '/images/ungrouped.png', tags: ungrouped };
+    return { id: 'ungrouped', name: 'Без группы', image: '/images/ungrouped.png', tags: ungrouped };
   }, [groups, allTags]);
 
   const allGroups = useMemo(() => [...groups, ungroupedGroup, noTagsGroup], [groups, ungroupedGroup, noTagsGroup]);
