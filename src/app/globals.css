@@ -197,3 +197,8 @@ body::after {
     display: none;
   }
 }
+
+/* Скрываем украинский флаг в копирайте Leaflet */
+.leaflet-attribution-flag {
+  display: none !important;
+}
