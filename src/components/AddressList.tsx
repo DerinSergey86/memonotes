@@ -8,9 +8,10 @@ interface AddressListProps {
   activeTagId: string | null;
   onAddressClick: (tagId: string) => void;
   onEdit: (tag: LocationTag) => void;
+  taskCounts: Record<string, number>;   // новое поле
 }
 
-export default function AddressList({ tags, activeTagId, onAddressClick, onEdit }: AddressListProps) {
+export default function AddressList({ tags, activeTagId, onAddressClick, onEdit, taskCounts }: AddressListProps) {
   const { ref, onMouseDown, onMouseLeave, onMouseUp, onMouseMove } = useDragScroll();
 
   const scroll = (dir: 'left' | 'right') => {
@@ -37,6 +38,7 @@ export default function AddressList({ tags, activeTagId, onAddressClick, onEdit 
               isActive={activeTagId === tag.id}
               onClick={onAddressClick}
               onEdit={onEdit}
+              taskCount={taskCounts[tag.id] || 0}
             />
           ))}
         </div>

@@ -7,7 +7,7 @@ interface NoteCardProps {
   onUpdate: (updatedNote: Note) => void;
   onTagClick: (tag: string) => void;
   locationTags: LocationTag[];
-  allTags: string[];  // ← новый пропс для подсказок
+  allTags: string[];
 }
 
 function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags }: NoteCardProps) {
@@ -47,24 +47,19 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
     setEditTags(prev => prev.filter(t => t !== tag));
   };
 
-  const handleAddEnterTag = () => {
-    const trimmed = enterInput.trim();
+  const addLocationTag = (
+    input: string,
+    currentIds: string[],
+    setIds: React.Dispatch<React.SetStateAction<string[]>>,
+    setInput: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const trimmed = input.trim();
     if (!trimmed) return;
     const found = locationTags.find(tag => tag.name.toLowerCase() === trimmed.toLowerCase());
-    if (found && !editEnterLocationTagIds.includes(found.id)) {
-      setEditEnterLocationTagIds(prev => [...prev, found.id]);
+    if (found && !currentIds.includes(found.id)) {
+      setIds(prev => [...prev, found.id]);
     }
-    setEnterInput('');
-  };
-
-  const handleAddExitTag = () => {
-    const trimmed = exitInput.trim();
-    if (!trimmed) return;
-    const found = locationTags.find(tag => tag.name.toLowerCase() === trimmed.toLowerCase());
-    if (found && !editExitLocationTagIds.includes(found.id)) {
-      setEditExitLocationTagIds(prev => [...prev, found.id]);
-    }
-    setExitInput('');
+    setInput('');
   };
 
   const handleSave = () => {
@@ -187,7 +182,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
         placeholder="Содержание"
       />
 
-      {/* Редактирование тегов как в форме создания */}
+      {/* Редактирование тегов */}
       <div style={{ marginBottom: '8px' }}>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '4px' }}>
           {editTags.map(tag => (
@@ -251,11 +246,11 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
               })}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input type="text" placeholder="Добавить метку" value={enterInput} onChange={e => setEnterInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddEnterTag(); } }} list="edit-enter-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <input type="text" placeholder="Добавить метку" value={enterInput} onChange={e => setEnterInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput); } }} list="edit-enter-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
               <datalist id="edit-enter-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={handleAddEnterTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+              <button type="button" onClick={() => addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput)} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
             </div>
           </div>
 
@@ -273,11 +268,11 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
               })}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input type="text" placeholder="Добавить метку" value={exitInput} onChange={e => setExitInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddExitTag(); } }} list="edit-exit-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <input type="text" placeholder="Добавить метку" value={exitInput} onChange={e => setExitInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput); } }} list="edit-exit-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
               <datalist id="edit-exit-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={handleAddExitTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+              <button type="button" onClick={() => addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput)} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
             </div>
           </div>
         </>

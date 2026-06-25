@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -14,6 +15,7 @@ import EditGroupModal from '@/components/EditGroupModal';
 import { useGeofencing } from '@/hooks/useGeofencing';
 import TagFilter from '@/components/TagFilter';
 import { useAllTags } from '@/hooks/useAllTags';
+import { useTaskReminders } from '@/hooks/useTaskReminders';
 
 export default function App() {
   const mounted = useMounted();
@@ -37,6 +39,8 @@ export default function App() {
   const [autoAddTag, setAutoAddTag] = useState<{ listType: 'enter' | 'exit'; tagId: string } | null>(null);
   const [focusedGroupId, setFocusedGroupId] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [remindersEnabled, setRemindersEnabled] = useState(false);
+useTaskReminders(notes, true);
 
   const [groups, setGroups] = useState<Group[]>([
     { id: '1', name: 'Семья', image: '/images/family.png', tags: ['семья'] },
@@ -68,7 +72,7 @@ export default function App() {
   const handleGroupClick = (group: Group) => {
     if (group.id === 'no-tags') {
       setActiveTags(['__no_tags__']);
-      setStrictFilter(true);   // для "без тегов" оставляем строгий режим
+      setStrictFilter(true);
       setFocusedGroupId(null);
       setFilterOpen(false);
       return;
@@ -80,16 +84,14 @@ export default function App() {
       setFilterOpen(true);
       return;
     }
-    // Обычная группа – переключаем в нестрогий режим
     const mainTag = group.name.toLowerCase();
     if (activeTags.includes(mainTag)) {
-      // Повторный клик – сброс
       setActiveTags([]);
       setStrictFilter(false);
       setFocusedGroupId(null);
     } else {
       setActiveTags([mainTag]);
-      setStrictFilter(false);   // ← теперь НЕ строгий режим
+      setStrictFilter(false);
       setFocusedGroupId(group.id);
     }
     setFilterOpen(false);
@@ -142,13 +144,11 @@ export default function App() {
     } else if (activeTags.length > 0) {
       result = result.filter(note => {
         if (strictFilter) {
-          // Точное совпадение: заметка должна содержать ровно выбранные теги и никаких других
           return (
             note.tags?.length === activeTags.length &&
             activeTags.every(tag => note.tags?.includes(tag))
           );
         } else {
-          // Нестрогий: хотя бы один из выбранных тегов присутствует
           return activeTags.some(tag => note.tags?.includes(tag));
         }
       });
@@ -267,6 +267,19 @@ export default function App() {
     if (!open) setFocusedGroupId(null);
   }, []);
 
+  // Подсчёт активных задач для каждой геометки
+  const taskCountByLocationTagId = useMemo(() => {
+    const counts: Record<string, number> = {};
+    locationTags.forEach(tag => {
+      counts[tag.id] = notes.filter(note =>
+        note.type === 'task' &&
+        !note.completed &&
+        (note.enterLocationTagIds?.includes(tag.id) || note.exitLocationTagIds?.includes(tag.id))
+      ).length;
+    });
+    return counts;
+  }, [locationTags, notes]);
+
   if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Загрузка...</div>;
   if (error) return <div style={{ color: 'red', textAlign: 'center' }}>Ошибка: {error}</div>;
 
@@ -314,7 +327,11 @@ export default function App() {
             ＋
           </button>
           <button onClick={handleGeoClick} style={{ height: '28px', padding: '0 14px', borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center' }}>{geoEnabled ? '📍 Геозоны вкл' : '📍 Геозоны выкл'}</button>
+        
+        
         </div>
+
+
 
         {/* Карусель */}
         {mounted && !showAddresses && (
@@ -331,6 +348,7 @@ export default function App() {
             activeTagId={locationTagFilter}
             onAddressClick={handleAddressClick}
             onEdit={handleEditAddress}
+            taskCounts={taskCountByLocationTagId}
           />
         )}
 
@@ -357,13 +375,7 @@ export default function App() {
         {/* Заметки */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {filteredNotes.map(note => (
-            <NoteCard key={note.id} 
-            note={note} 
-            onDelete={handleDeleteNote} 
-            onUpdate={handleUpdateNote} 
-            onTagClick={handleTagToggle} 
-            locationTags={locationTags}
-            allTags={allTags} />
+            <NoteCard key={note.id} note={note} onDelete={handleDeleteNote} onUpdate={handleUpdateNote} onTagClick={handleTagToggle} locationTags={locationTags} allTags={allTags} />
           ))}
         </div>
 
@@ -371,11 +383,7 @@ export default function App() {
           <AddressFormModal initial={editingAddress} onSave={handleSaveAddress} onClose={() => setEditingAddress(undefined)} onDelete={handleDeleteAddress} />
         )}
         {editingGroup && (
-          <EditGroupModal 
-          group={editingGroup} 
-          onSave={handleSaveGroup} 
-          onClose={() => setEditingGroup(null)} 
-          allTags={allTags} />
+          <EditGroupModal group={editingGroup} onSave={handleSaveGroup} onClose={() => setEditingGroup(null)} allTags={allTags} />
         )}
       </div>
     </div>

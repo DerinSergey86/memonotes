@@ -6,9 +6,10 @@ interface AddressCardProps {
   isActive: boolean;
   onClick: (tagId: string) => void;
   onEdit: (tag: LocationTag) => void;
+  taskCount: number;   // новое поле
 }
 
-export default function AddressCard({ tag, isActive, onClick, onEdit }: AddressCardProps) {
+export default function AddressCard({ tag, isActive, onClick, onEdit, taskCount }: AddressCardProps) {
   return (
     <div
       onClick={() => onClick(tag.id)}
@@ -19,12 +20,14 @@ export default function AddressCard({ tag, isActive, onClick, onEdit }: AddressC
         width: '120px',
         flexShrink: 0,
         textAlign: 'center',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        boxShadow: isActive ? '0 0 8px rgba(133, 156, 94, 0.5)' : '0 2px 4px rgba(0,0,0,0.1)',
         position: 'relative',
         cursor: 'pointer',
         transform: isActive ? 'scale(1.05)' : 'scale(1)',
+        transition: 'all 0.2s',
       }}
     >
+      {/* Кнопка редактирования */}
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -48,6 +51,8 @@ export default function AddressCard({ tag, isActive, onClick, onEdit }: AddressC
       >
         ✎
       </button>
+
+      {/* Картинка или иконка */}
       {tag.image ? (
         <img src={tag.image} alt={tag.name} style={{ width: '100%', height: '80px', objectFit: 'cover' }} />
       ) : (
@@ -55,9 +60,32 @@ export default function AddressCard({ tag, isActive, onClick, onEdit }: AddressC
           📍
         </div>
       )}
+
+      {/* Название */}
       <div style={{ padding: '4px', fontWeight: 'bold', fontSize: '14px', color: '#666' }}>
         {tag.name}
       </div>
+
+      {/* Счётчик активных задач */}
+      {taskCount > 0 && (
+        <div style={{
+          position: 'absolute',
+          top: '4px',
+          right: '4px',
+          background: '#e74c3c',
+          color: 'white',
+          borderRadius: '50%',
+          width: '20px',
+          height: '20px',
+          fontSize: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+        }}>
+          {taskCount}
+        </div>
+      )}
     </div>
   );
 }

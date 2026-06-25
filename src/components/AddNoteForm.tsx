@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -27,7 +28,6 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
   useEffect(() => {
     if (autoAddTag) {
       if (autoAddTag.listType === 'enter') {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEnterLocationTagIds(prev => prev.includes(autoAddTag.tagId) ? prev : [...prev, autoAddTag.tagId]);
         setEnterInput('');
       } else {
@@ -50,6 +50,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
     setTagsArray(prev => prev.filter(t => t !== tag));
   };
 
+  // Универсальная функция добавления геометки (плашки)
   const addLocationTag = (
     input: string,
     currentIds: string[],
@@ -65,7 +66,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
         setIds(prev => [...prev, found.id]);
       }
     } else {
-      onRequestNewLocation(listType); // запрос на создание нового адреса
+      onRequestNewLocation(listType);
     }
     setInput('');
   };
