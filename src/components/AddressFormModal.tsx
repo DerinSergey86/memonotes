@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import { type LocationTag } from '@/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
-// Динамический импорт для карты, чтобы избежать проблем с SSR
 import dynamic from 'next/dynamic';
 
 const LocationPickerMap = dynamic(() => import('./LocationPickerMap'), {
@@ -35,10 +34,7 @@ function compressImage(file: File): Promise<string> {
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Canvas error'));
-          return;
-        }
+        if (!ctx) { reject(new Error('Canvas error')); return; }
         ctx.drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', 0.7));
       };
@@ -105,32 +101,8 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-      }}
-    >
-      <div
-        style={{
-          background: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          width: '90%',
-          maxWidth: '500px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-        }}
-      >
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+      <div style={{ background: 'white', padding: '20px', borderRadius: '8px', width: '90%', maxWidth: '500px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', maxHeight: '90vh', overflowY: 'auto' }}>
         <h3>{initial ? 'Редактировать адрес' : 'Новый адрес'}</h3>
         {localError && <p style={{ color: 'red' }}>{localError}</p>}
         <form onSubmit={handleSubmit}>
@@ -156,29 +128,17 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
               </div>
             )}
           </div>
-
-          {/* Кнопка определения координат */}
-          <button
-            type="button"
-            onClick={async () => {
-              setGettingCoords(true);
-              try {
-                const coords = await getPosition();
-                setLatitude(coords.latitude);
-                setLongitude(coords.longitude);
-              } catch {
-                setLocalError('Не удалось получить координаты');
-              } finally {
-                setGettingCoords(false);
-              }
-            }}
-            disabled={gettingCoords}
-            style={{ marginBottom: '12px', padding: '4px 8px' }}
-          >
+          <button type="button" onClick={async () => {
+            setGettingCoords(true);
+            try {
+              const coords = await getPosition();
+              setLatitude(coords.latitude);
+              setLongitude(coords.longitude);
+            } catch { setLocalError('Не удалось получить координаты'); }
+            finally { setGettingCoords(false); }
+          }} disabled={gettingCoords} style={{ marginBottom: '12px', padding: '4px 8px' }}>
             {gettingCoords ? 'Поиск...' : '📍 Определить местоположение'}
           </button>
-
-          {/* Интерактивная карта */}
           <div style={{ marginBottom: '12px' }}>
             <label>Выберите точку на карте:</label>
             <LocationPickerMap
@@ -189,6 +149,7 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
                 setLongitude(lng);
                 setLocalError('');
               }}
+              radius={parseFloat(radius) || 50}
             />
             {latitude && longitude && (
               <p style={{ fontSize: '12px', color: 'green', marginTop: '4px' }}>
@@ -196,28 +157,12 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
               </p>
             )}
           </div>
-
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
             {initial && onDelete && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.confirm('Удалить адрес?')) {
-                    onDelete(initial.id);
-                    onClose();
-                  }
-                }}
-                style={{ color: 'red', padding: '6px 14px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff' }}
-              >
-                Удалить
-              </button>
+              <button type="button" onClick={() => { if (window.confirm('Удалить адрес?')) { onDelete(initial.id); onClose(); } }} style={{ color: 'red', padding: '6px 14px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff' }}>Удалить</button>
             )}
-            <button type="button" onClick={onClose} style={{ padding: '6px 14px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff' }}>
-              Отмена
-            </button>
-            <button type="submit" style={{ padding: '6px 14px', borderRadius: '4px', background: '#859c5e', color: 'white', border: 'none' }}>
-              Сохранить
-            </button>
+            <button type="button" onClick={onClose} style={{ padding: '6px 14px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff' }}>Отмена</button>
+            <button type="submit" style={{ padding: '6px 14px', borderRadius: '4px', background: '#859c5e', color: 'white', border: 'none' }}>Сохранить</button>
           </div>
         </form>
       </div>
