@@ -43,4 +43,5 @@ model LocationTag {
   radius    Float?  @default(50)
   userId    String
   user      User    @relation(fields: [userId], references: [id])
+  enabled Boolean @default(true)
 }

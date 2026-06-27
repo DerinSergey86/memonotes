@@ -30,4 +30,5 @@ export interface LocationTag {
   latitude?: number | null;
   longitude?: number | null;
   radius?: number | null;
+  enabled?: boolean;
 }

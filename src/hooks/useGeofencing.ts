@@ -26,7 +26,7 @@ export function useGeofencing({ locationTags, notes, enabled }: UseGeofencingPro
     if (!latitude || !longitude || !enabled) return;
 
     locationTags.forEach(tag => {
-      if (!tag.latitude || !tag.longitude || !tag.radius) return;
+      if (!tag.latitude || !tag.longitude || !tag.radius || !tag.enabled) return;
 
       const distance = getDistanceFromLatLngInMeters(latitude, longitude, tag.latitude, tag.longitude);
       const inside = distance <= tag.radius;

@@ -54,6 +54,7 @@ interface AddressFormModalProps {
     latitude: number | null;
     longitude: number | null;
     image?: string;
+    enabled?: boolean;
   }) => void;
   onClose: () => void;
   onDelete?: (id: string) => void;
@@ -69,6 +70,7 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
   const [image, setImage] = useState(initial?.image || '');
   const [localError, setLocalError] = useState('');
   const [gettingCoords, setGettingCoords] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(initial?.enabled ?? true);
 
   const { getPosition } = useGeolocation();
 
@@ -97,6 +99,7 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
       latitude,
       longitude,
       image: image.trim() || undefined,
+      enabled: isEnabled,
     });
   };
 
@@ -156,6 +159,16 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
                 ✅ Координаты: {latitude.toFixed(6)}, {longitude.toFixed(6)}
               </p>
             )}
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={isEnabled}
+                onChange={(e) => setIsEnabled(e.target.checked)}
+              />
+              Геозона активна
+            </label>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
             {initial && onDelete && (

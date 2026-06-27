@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, address, latitude, longitude, radius, image } = body;
+  const { name, address, latitude, longitude, radius, image, enabled } = body;
 
   if (!name) {
     return NextResponse.json({ error: 'Название обязательно' }, { status: 400 });
@@ -32,11 +32,12 @@ export async function POST(request: Request) {
   const tag = await prisma.locationTag.create({
     data: {
       name,
-      address: address || '',   // ← пустая строка вместо null
+      address: address || '',
       latitude: latitude || null,
       longitude: longitude || null,
       radius: Number(radius) || 50,
-      image: image || '',       // тоже пустая строка, если нет картинки
+      image: image || '',
+      enabled: enabled !== undefined ? enabled : true,
       user: { connect: { id: session.user.id } },
     },
   });
@@ -51,10 +52,10 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const { id, name, address, latitude, longitude, radius, image } = body;
+  const { id, name, address, latitude, longitude, radius, image, enabled } = body;
 
-  if (!id || !name) {
-    return NextResponse.json({ error: 'ID и название обязательны' }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: 'ID обязателен' }, { status: 400 });
   }
 
   const existing = await prisma.locationTag.findUnique({ where: { id } });
@@ -65,12 +66,13 @@ export async function PUT(request: Request) {
   const updated = await prisma.locationTag.update({
     where: { id },
     data: {
-      name,
+      name: name !== undefined ? name : existing.name,
       address: address !== undefined ? address : existing.address,
       latitude: latitude ?? existing.latitude,
       longitude: longitude ?? existing.longitude,
       radius: radius ?? existing.radius,
       image: image !== undefined ? image : existing.image,
+      enabled: enabled !== undefined ? enabled : existing.enabled,
     },
   });
 

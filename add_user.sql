@@ -1,0 +1,1 @@
+INSERT INTO User (id, email, password) VALUES ('b2e78b48-935c-488e-8cf0-699591a104be', 'test@test.com', '123456');
