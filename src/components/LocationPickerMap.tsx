@@ -17,7 +17,7 @@ interface LocationPickerMapProps {
   latitude: number | null;
   longitude: number | null;
   onLocationChange: (lat: number, lng: number) => void;
-  radius?: number; // радиус в метрах для отображения круга
+  radius?: number;
 }
 
 function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
@@ -44,6 +44,7 @@ export default function LocationPickerMap({ latitude, longitude, onLocationChang
         }
       `}</style>
       <MapContainer
+        key={`${latitude}_${longitude}`}  // ← пересоздаём карту при изменении координат
         center={defaultCenter}
         zoom={13}
         style={{ height: '300px', width: '100%', borderRadius: '8px', marginBottom: '12px' }}
