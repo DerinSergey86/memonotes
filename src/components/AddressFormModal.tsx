@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { type LocationTag } from '@/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import dynamic from 'next/dynamic';
@@ -61,6 +62,55 @@ interface AddressFormModalProps {
   initial?: LocationTag | null;
 }
 
+// Прямое геокодирование: адрес -> координаты (только Россия)
+async function geocodeAddress(address: string): Promise<{ lat: number; lon: number } | null> {
+  try {
+    const url = new URL('https://nominatim.openstreetmap.org/search');
+    url.searchParams.set('q', address);
+    url.searchParams.set('format', 'json');
+    url.searchParams.set('limit', '1');
+    url.searchParams.set('accept-language', 'ru');
+    url.searchParams.set('countrycodes', 'ru');         // ищем только в России
+    const res = await fetch(url.toString(), {
+      headers: { 'User-Agent': 'MemoNotes/1.0 (sergey@example.com)' },
+    });
+    const data = await res.json();
+    if (data && data[0]) {
+      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    }
+  } catch {}
+  return null;
+}
+
+// Обратное геокодирование: координаты -> читаемый адрес (без организаций)
+async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
+  try {
+    const url = new URL('https://nominatim.openstreetmap.org/reverse');
+    url.searchParams.set('lat', lat.toString());
+    url.searchParams.set('lon', lon.toString());
+    url.searchParams.set('format', 'json');
+    url.searchParams.set('accept-language', 'ru');
+    url.searchParams.set('zoom', '18');
+    url.searchParams.set('addressdetails', '1');
+    const res = await fetch(url.toString(), {
+      headers: { 'User-Agent': 'MemoNotes/1.0 (sergey@example.com)' },
+    });
+    const data = await res.json();
+    if (data && data.address) {
+      const parts: string[] = [];
+      const adr = data.address;
+      if (adr.road) parts.push(adr.road);
+      if (adr.house_number) parts.push(adr.house_number);
+      if (adr.city || adr.town || adr.village) parts.push(adr.city || adr.town || adr.village);
+      if (adr.state) parts.push(adr.state);
+      if (adr.country) parts.push(adr.country);
+      return parts.join(', ') || data.display_name;
+    }
+    return data.display_name || null;
+  } catch {}
+  return null;
+}
+
 export default function AddressFormModal({ onSave, onClose, onDelete, initial }: AddressFormModalProps) {
   const [name, setName] = useState(initial?.name || '');
   const [address, setAddress] = useState(initial?.address || '');
@@ -73,6 +123,33 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
   const [isEnabled, setIsEnabled] = useState(initial?.enabled ?? true);
 
   const { getPosition } = useGeolocation();
+  const addressTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // При вводе адреса с задержкой получаем координаты
+  const handleAddressChange = useCallback((value: string) => {
+    setAddress(value);
+    if (addressTimerRef.current) clearTimeout(addressTimerRef.current);
+    addressTimerRef.current = setTimeout(async () => {
+      if (value.trim().length > 2) {
+        const coords = await geocodeAddress(value.trim());
+        if (coords) {
+          setLatitude(coords.lat);
+          setLongitude(coords.lon);
+        }
+      }
+    }, 1500);
+  }, []);
+
+  // При изменении координат всегда обновляем адрес (даже если поле уже заполнено)
+  useEffect(() => {
+    if (latitude && longitude) {
+      reverseGeocode(latitude, longitude).then(addr => {
+        if (addr && addr !== address) {
+          setAddress(addr);
+        }
+      });
+    }
+  }, [latitude, longitude]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,7 +192,7 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
           </div>
           <div style={{ marginBottom: '12px' }}>
             <label>Адрес (необязательно):</label>
-            <input type="text" value={address} onChange={e => setAddress(e.target.value)} style={{ width: '100%', marginTop: '4px' }} placeholder="ул. Пушкина, 1" />
+            <input type="text" value={address} onChange={e => handleAddressChange(e.target.value)} style={{ width: '100%', marginTop: '4px' }} placeholder="ул. Пушкина, 1" />
           </div>
           <div style={{ marginBottom: '12px' }}>
             <label>Радиус (м):</label>
