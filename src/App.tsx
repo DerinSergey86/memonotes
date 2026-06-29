@@ -286,17 +286,30 @@ useTaskReminders(notes, true);
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', borderLeft: '1px solid #e0e0e0', borderRight: '1px solid #e0e0e0', minHeight: '100vh', padding: '0' }}>
       <div style={{ padding: '0 20px' }}>
-        {/* Шапка */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', position: 'relative' }}>
-          <div style={{ flex: 1, textAlign: 'center' }}>
-            <h1 style={{ margin: 0, fontSize: '36px', lineHeight: '48px' }}>MemoNotes 📝</h1>
-          </div>
-          <div style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)' }}>
-            {session ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span>{session.user?.email}</span><button onClick={() => signOut()} style={{ padding: '4px 8px', borderRadius: '8px', border: '1px solid #ccc' }}>Выйти</button></div>
-            ) : <a href="/login" style={{ color: '#859c5e' }}>Войти</a>}
-          </div>
-        </div>
+{/* Шапка */}
+<div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', justifyContent: 'space-between' }}>
+  {/* Левая колонка – email и кнопка Войти/Выйти */}
+  <div style={{ minWidth: '150px' }}>
+    {session ? (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ fontSize: '14px' }}>{session.user?.email}</span>
+        <button onClick={() => signOut()} style={{ padding: '4px 8px', borderRadius: '8px', border: '1px solid #ccc', background: '#f0f0f0', cursor: 'pointer', fontSize: '14px' }}>
+          Выйти
+        </button>
+      </div>
+    ) : (
+      <a href="/login" style={{ textDecoration: 'none', color: '#859c5e', fontSize: '14px' }}>Войти</a>
+    )}
+  </div>
+
+  {/* Центральная колонка – заголовок */}
+  <div style={{ flex: 1, textAlign: 'center' }}>
+    <h1 style={{ margin: 0, fontSize: '36px', lineHeight: '48px' }}>MemoNotes 📝</h1>
+  </div>
+
+  {/* Правая колонка – пустая, для симметрии */}
+  <div style={{ minWidth: '150px' }} />
+</div>
 
         {/* Фильтр */}
         <TagFilter
