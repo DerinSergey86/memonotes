@@ -1,150 +1,4 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
-
-.scroll-button {
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  font-size: 34px;
-  line-height: 1;
-  cursor: pointer;
-  opacity: 0.25; 
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  font-size: 16px;
-  color: #333;
-  padding: 0 4px;
-  outline: none;
-}
-
-.scroll-button:hover {
-  opacity: 0.9;
-  transform: scale(1.2);
-}
-
-.group-container:hover .scroll-button {
-  opacity: 0.7;
-}
-
-.group-container:hover .scroll-button:hover {
-  opacity: 1;
-  transform: scale(1.2);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-/* Полный сброс отступов и box-sizing */
+/* Минимальный сброс */
 *,
 *::before,
 *::after {
@@ -167,38 +21,125 @@ body {
   line-height: 1.5;
 }
 
-/* Дополнительно убираем стили у списков, если они у тебя были */
-ul, ol {
-  list-style: none;
+/* Стрелки каруселей */
+.scroll-button {
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.25;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  color: #333;
+  padding: 0 4px;
+  outline: none;
 }
 
-body::before,
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background-color: #e0e0e0;
-  z-index: 1000;
+.scroll-button:hover {
+  opacity: 0.9;
+  transform: scale(1.2);
 }
 
-body::before {
-  left: calc((100% - 1200px) / 2);
+.group-container:hover .scroll-button {
+  opacity: 0.7;
+}
+.group-container:hover .scroll-button:hover {
+  opacity: 1;
+  transform: scale(1.2);
 }
 
-body::after {
-  right: calc((100% - 1200px) / 2);
+/* ============================================= */
+/* 🖥️ ДЕСКТОП – единая высота 32px              */
+/* ============================================= */
+.btn,
+.btn-group,
+.btn-icon,
+.btn-geo {
+  height: 32px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  border: 1px solid transparent;
 }
 
-@media (max-width: 1240px) {
-  body::before,
-  body::after {
+/* Круглая кнопка (плюс) */
+.btn-icon {
+  width: 32px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Сегментированные переключатели – убираем отступы и скругляем края */
+.btn-group {
+  border-radius: 0;
+  margin: 0;
+}
+
+/* Поле поиска в фильтре – такая же высота */
+.tag-filter-input {
+  height: 32px;
+  font-size: 14px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* ============================================= */
+/* 📱 МОБИЛЬНАЯ АДАПТАЦИЯ (экраны до 768px)      */
+/* ============================================= */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 24px !important;
+    line-height: 32px !important;
+  }
+
+  /* Карусели – сетка */
+  .group-container > div[style*="overflow-x: auto"] {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .group-container > div[style*="overflow-x: auto"] > * {
+    width: calc(33.333% - 8px);
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+
+  .scroll-button {
     display: none;
   }
-}
 
-/* Скрываем украинский флаг в копирайте Leaflet */
-.leaflet-attribution-flag {
-  display: none !important;
+  /* Модальные окна */
+  div[style*="position: fixed"] > div[style*="background: white"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Мобильная высота – 44px */
+  .btn,
+  .btn-group,
+  .btn-icon,
+  .btn-geo,
+  .tag-filter-input {
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .btn-icon {
+    width: 44px;
+  }
+
+  .hide-on-mobile {
+    display: none;
+  }
 }
