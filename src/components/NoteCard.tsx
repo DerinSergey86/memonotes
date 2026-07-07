@@ -143,12 +143,12 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
         )}
 
         <div style={{ marginTop: '8px' }}>
-          <button onClick={handleStartEditing} style={{ marginRight: '8px', padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>
+          <button onClick={handleStartEditing} className="btn" style={{ marginRight: '8px', border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
             Редактировать
           </button>
           <button onClick={() => {
             if (window.confirm('Удалить заметку?')) onDelete(note.id);
-          }} style={{ color: 'red', padding: '4px 8px', borderRadius: '8px', border: 'solid 1px black' }}>
+          }} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
             Удалить
           </button>
         </div>
@@ -171,6 +171,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
         type="text"
         value={editTitle}
         onChange={(e) => setEditTitle(e.target.value)}
+        className="form-input"
         style={{ width: '100%', marginBottom: '8px', fontWeight: 'bold' }}
         placeholder="Заголовок"
       />
@@ -178,6 +179,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
         value={editContent}
         onChange={(e) => setEditContent(e.target.value)}
         rows={4}
+        className="form-input"
         style={{ width: '100%', marginBottom: '8px' }}
         placeholder="Содержание"
       />
@@ -218,14 +220,17 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
             onChange={(e) => setEditInputTag(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddEditTag(); } }}
             list="edit-tags-list"
-            style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
+            className="form-input"
+            style={{ flex: 1 }}
           />
           <datalist id="edit-tags-list">
             {allTags.map(tag => (
               <option key={tag} value={tag} />
             ))}
           </datalist>
-          <button type="button" onClick={handleAddEditTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+          <button type="button" onClick={handleAddEditTag} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+            Добавить
+          </button>
         </div>
       </div>
 
@@ -246,11 +251,13 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
               })}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input type="text" placeholder="Добавить метку" value={enterInput} onChange={e => setEnterInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput); } }} list="edit-enter-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <input type="text" placeholder="Добавить метку" value={enterInput} onChange={e => setEnterInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput); } }} list="edit-enter-tags-list" className="form-input" style={{ flex: 1 }} />
               <datalist id="edit-enter-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={() => addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput)} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+              <button type="button" onClick={() => addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput)} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+                Добавить
+              </button>
             </div>
           </div>
 
@@ -268,21 +275,23 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
               })}
             </div>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input type="text" placeholder="Добавить метку" value={exitInput} onChange={e => setExitInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput); } }} list="edit-exit-tags-list" style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }} />
+              <input type="text" placeholder="Добавить метку" value={exitInput} onChange={e => setExitInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput); } }} list="edit-exit-tags-list" className="form-input" style={{ flex: 1 }} />
               <datalist id="edit-exit-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={() => addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput)} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+              <button type="button" onClick={() => addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput)} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+                Добавить
+              </button>
             </div>
           </div>
         </>
       )}
 
       <div>
-        <button onClick={handleSave} style={{ marginRight: '8px', padding: '4px 12px', borderRadius: '8px', border: 'solid 1px' }}>
+        <button onClick={handleSave} className="btn" style={{ marginRight: '8px', border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
           Сохранить
         </button>
-        <button onClick={handleCancel} style={{ padding: '4px 12px', borderRadius: '8px', border: 'solid 1px' }}>
+        <button onClick={handleCancel} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
           Отмена
         </button>
       </div>

@@ -108,15 +108,16 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
     <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
       <input type="submit" style={{ display: 'none' }} />
       <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-        <button type="button" onClick={handleClear} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>
-          Очистить
-        </button>
+<button type="button" onClick={handleClear} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0' }}>
+  Очистить
+</button>
         <input
           type="text"
           placeholder="Заголовок заметки"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
+          className="form-input"
+          style={{ flex: 1 }}
         />
       </div>
       <textarea
@@ -124,7 +125,8 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={4}
-        style={{ width: '100%', marginBottom: '8px', borderRadius: '8px', border: 'solid 1px' }}
+        className="form-input"
+        style={{ width: '100%', marginBottom: '8px', borderRadius: '8px' }}
       />
 
       <div style={{ marginBottom: '8px' }}>
@@ -158,14 +160,17 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
             onChange={(e) => setInputTag(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTag(); } }}
             list="tags-list"
-            style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
+            className="form-input"
+            style={{ flex: 1, borderRadius: '8px' }}
           />
           <datalist id="tags-list">
             {allTags.map(tag => (
               <option key={tag} value={tag} />
             ))}
           </datalist>
-          <button type="button" onClick={handleAddTag} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+<button type="button" onClick={handleAddTag} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+  Добавить
+</button>
         </div>
       </div>
 
@@ -204,12 +209,15 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
                 onChange={e => setEnterInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter'); } }}
                 list="enter-tags-list"
-                style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
+                className="form-input"
+                style={{ flex: 1, borderRadius: '8px' }}
               />
               <datalist id="enter-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+<button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+  Добавить
+</button>
             </div>
           </div>
 
@@ -235,19 +243,24 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
                 onChange={e => setExitInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLocationTag(exitInput, exitLocationTagIds, setExitLocationTagIds, setExitInput, 'exit'); } }}
                 list="exit-tags-list"
-                style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
+                className="form-input"
+                style={{ flex: 1, borderRadius: '8px' }}
               />
               <datalist id="exit-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={() => addLocationTag(exitInput, exitLocationTagIds, setExitLocationTagIds, setExitInput, 'exit')} style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить</button>
+<button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+  Добавить
+</button>
             </div>
           </div>
         </>
       )}
 
       <div style={{ textAlign: 'center', marginTop: '8px' }}>
-        <button type="submit" style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}>Добавить заметку</button>
+<button type="submit" className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+  Добавить заметку
+</button>
       </div>
     </form>
   );
