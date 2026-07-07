@@ -90,6 +90,34 @@ body {
   box-sizing: border-box;
 }
 
+.form-input {
+  height: 32px;
+  font-size: 14px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #859c5e;
+}
+
+/* Для textarea — высота авто, но шрифт и паддинг такие же */
+textarea.form-input {
+  height: auto;
+  min-height: 80px;
+  padding: 8px;
+  resize: vertical;
+}
+
+.form-btn {
+  /* наследует .btn, если мы укажем оба класса */
+}
+
 /* ============================================= */
 /* 📱 МОБИЛЬНАЯ АДАПТАЦИЯ (экраны до 768px)      */
 /* ============================================= */
@@ -141,5 +169,10 @@ body {
 
   .hide-on-mobile {
     display: none;
+  }
+
+  .form-input {
+    height: 44px;
+    font-size: 16px;
   }
 }
