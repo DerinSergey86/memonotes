@@ -64,7 +64,12 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
-  border: 1px solid transparent;
+  
+}
+
+/* Убираем прозрачную рамку, чтобы кнопки касались контейнера */
+.btn-group {
+  border: none;
 }
 
 /* Круглая кнопка (плюс) */
@@ -189,18 +194,24 @@ textarea.form-input {
   .controls-row .btn-icon,
   .controls-row .btn-geo {
     height: 44px;
-    font-size: 16px;
-    padding: 0 6px;
-    border-radius: 22px;
+    font-size: 14px;
   }
 
   .controls-row .btn-icon {
     width: 44px;
+    border-radius: 50%;
     padding: 0;
+    font-size: 18px;
   }
 
   .controls-row .btn-geo {
-    font-size: 22px;
+    font-size: 14px;
+    border-radius: 50%;
+    width: 44px;
+    padding: 0;
+    display: flex;
+  align-items: center;
+  justify-content: center;
   }
 
   /* Показываем иконку, скрываем текст */
