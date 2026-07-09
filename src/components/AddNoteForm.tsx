@@ -168,7 +168,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
               <option key={tag} value={tag} />
             ))}
           </datalist>
-<button type="button" onClick={handleAddTag} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+<button type="button" onClick={handleAddTag} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0' }}>
   Добавить
 </button>
         </div>
@@ -215,7 +215,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
               <datalist id="enter-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-<button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+<button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0' }}>
   Добавить
 </button>
             </div>
@@ -249,7 +249,12 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
               <datalist id="exit-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-<button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+<button
+  type="button"
+  onClick={() => addLocationTag(exitInput, exitLocationTagIds, setExitLocationTagIds, setExitInput, 'exit')}
+  className="btn"
+  style={{ border: '1px solid #ccc', background: '#f0f0f0' }}
+>
   Добавить
 </button>
             </div>
@@ -258,7 +263,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
       )}
 
       <div style={{ textAlign: 'center', marginTop: '8px' }}>
-<button type="submit" className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+<button type="submit" className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0' }}>
   Добавить заметку
 </button>
       </div>
