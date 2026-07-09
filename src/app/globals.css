@@ -176,3 +176,45 @@ textarea.form-input {
     font-size: 16px;
   }
 }
+
+/* ============================================= */
+/* 📱 УЗКИЕ МОБИЛЬНЫЕ (экраны до 480px)          */
+/* ============================================= */
+@media (max-width: 480px) {
+  .controls-row {
+    gap: 4px;
+  }
+
+  .controls-row .btn-group,
+  .controls-row .btn-icon,
+  .controls-row .btn-geo {
+    height: 44px;
+    font-size: 16px;
+    padding: 0 6px;
+    border-radius: 22px;
+  }
+
+  .controls-row .btn-icon {
+    width: 44px;
+    padding: 0;
+  }
+
+  .controls-row .btn-geo {
+    font-size: 22px;
+  }
+
+  /* Показываем иконку, скрываем текст */
+  .btn-geo__text {
+    display: none;
+  }
+  .btn-geo__icon {
+    display: inline;
+  }
+}
+
+/* Десктоп и планшеты: показываем текст, скрываем иконку */
+@media (min-width: 481px) {
+  .btn-geo__icon {
+    display: none;
+  }
+}

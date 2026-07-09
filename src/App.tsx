@@ -329,7 +329,7 @@ useTaskReminders(notes, true);
         />
 
 {/* Переключатель Группы / Адреса + кнопка добавления + геозоны */}
-<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
+<div className="controls-row" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
   <div style={{ display: 'inline-flex', borderRadius: '20px', overflow: 'hidden', border: '1px solid #859c5e' }}>
     <button onClick={() => setShowAddresses(false)} className="btn-group" style={{ border: 'none', background: !showAddresses ? '#859c5e' : 'transparent', color: !showAddresses ? 'white' : '#859c5e', cursor: 'pointer' }}>
       🏷️ Группы
@@ -342,7 +342,8 @@ useTaskReminders(notes, true);
     ＋
   </button>
   <button onClick={handleGeoClick} className="btn-geo" style={{ borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer' }}>
-    {geoEnabled ? '📍 Вкл' : '📍 Выкл'}
+    <span className="btn-geo__text">{geoEnabled ? '📍 Вкл' : '📍 Выкл'}</span>
+    <span className="btn-geo__icon">{geoEnabled ? '🟢' : '🔴'}</span>
   </button>
 </div>
 
