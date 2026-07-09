@@ -294,12 +294,12 @@ useTaskReminders(notes, true);
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span className="hide-on-mobile" style={{ fontSize: '14px' }}>{session.user?.email}</span>
 {/* Выйти */}
-<button onClick={() => signOut()} className="btn" style={{ borderRadius: '8px', border: '1px solid #ccc', background: '#f0f0f0', cursor: 'pointer' }}>
+<button onClick={() => signOut()} className="btn" style={{ borderRadius: '8px', border: '1px solid #ccc', background: '#f0f0f0', color: '#333', cursor: 'pointer' }}>
   Выйти
 </button>
       </div>
     ) : (
-<a href="/login" className="btn" style={{ justifyContent: 'center', textDecoration: 'none', color: '#859c5e', borderRadius: '8px', border: '1px solid #859c5e' }}>
+<a href="/login" className="btn" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: '#859c5e', borderRadius: '8px', border: '1px solid #859c5e', background: 'transparent', cursor: 'pointer' }}>
   Войти
 </a>
 )}
@@ -331,13 +331,14 @@ useTaskReminders(notes, true);
 {/* Переключатель Группы / Адреса + кнопка добавления + геозоны */}
 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
   <div style={{ display: 'inline-flex', borderRadius: '20px', overflow: 'hidden', border: '1px solid #859c5e' }}>
-    <button onClick={() => setShowAddresses(false)} className="btn-group" style={{ border: 'none', background: !showAddresses ? '#859c5e' : 'transparent', color: !showAddresses ? 'white' : '#859c5e', cursor: 'pointer' }}>🏷️ Группы</button>
-    <button onClick={() => setShowAddresses(true)} className="btn-group" style={{ border: 'none', background: showAddresses ? '#859c5e' : 'transparent', color: showAddresses ? 'white' : '#859c5e', cursor: 'pointer' }}>🗺️ Адреса</button>
+    <button onClick={() => setShowAddresses(false)} className="btn-group" style={{ border: 'none', background: !showAddresses ? '#859c5e' : 'transparent', color: !showAddresses ? 'white' : '#859c5e', cursor: 'pointer' }}>
+      🏷️ Группы
+    </button>
+    <button onClick={() => setShowAddresses(true)} className="btn-group" style={{ border: 'none', background: showAddresses ? '#859c5e' : 'transparent', color: showAddresses ? 'white' : '#859c5e', cursor: 'pointer' }}>
+      🗺️ Адреса
+    </button>
   </div>
-  <button onClick={showAddresses ? handleAddAddress : handleAddGroup} className="btn-icon" style={{
-    background: '#859c5e', color: 'white', border: 'none',
-    cursor: 'pointer'
-  }}>
+  <button onClick={showAddresses ? handleAddAddress : handleAddGroup} className="btn-icon" style={{ background: '#859c5e', color: 'white', border: 'none', cursor: 'pointer' }}>
     ＋
   </button>
   <button onClick={handleGeoClick} className="btn-geo" style={{ borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer' }}>
@@ -369,8 +370,12 @@ useTaskReminders(notes, true);
         {/* Знания/Дела */}
 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px', gap: '10px' }}>
   <div style={{ display: 'inline-flex', borderRadius: '20px', border: '1px solid #859c5e', overflow: 'hidden' }}>
-    <button onClick={() => setNoteTypeFilter(noteTypeFilter === 'note' ? 'all' : 'note')} className="btn-group" style={{ border: 'none', background: noteTypeFilter === 'note' ? '#859c5e' : 'transparent', color: noteTypeFilter === 'note' ? 'white' : '#859c5e', cursor: 'pointer' }}>📝 Знания</button>
-    <button onClick={() => setNoteTypeFilter(noteTypeFilter === 'task' ? 'all' : 'task')} className="btn-group" style={{ border: 'none', background: noteTypeFilter === 'task' ? '#859c5e' : 'transparent', color: noteTypeFilter === 'task' ? 'white' : '#859c5e', cursor: 'pointer' }}>📌 Дела</button>
+    <button onClick={() => setNoteTypeFilter(noteTypeFilter === 'note' ? 'all' : 'note')} className="btn-group" style={{ border: 'none', background: noteTypeFilter === 'note' ? '#859c5e' : 'transparent', color: noteTypeFilter === 'note' ? 'white' : '#859c5e', cursor: 'pointer' }}>
+      📝 Знания
+    </button>
+    <button onClick={() => setNoteTypeFilter(noteTypeFilter === 'task' ? 'all' : 'task')} className="btn-group" style={{ border: 'none', background: noteTypeFilter === 'task' ? '#859c5e' : 'transparent', color: noteTypeFilter === 'task' ? 'white' : '#859c5e', cursor: 'pointer' }}>
+      📌 Дела
+    </button>
   </div>
 </div>
 
@@ -378,10 +383,11 @@ useTaskReminders(notes, true);
 
         {/* Форма */}
 <div style={{ textAlign: 'center', margin: '10px 0' }}>
-  <button onClick={() => setIsFormOpen(!isFormOpen)} className="btn" style={{ borderRadius: '8px', border: '1px solid #ccc', justifyContent: 'center', margin: '0 auto' }}>
+  <button onClick={() => setIsFormOpen(!isFormOpen)} className="btn" style={{ borderRadius: '8px', border: '1px solid #ccc', background: '#f0f0f0', color: '#333', cursor: 'pointer', margin: '0 auto' }}>
     {isFormOpen ? '▲ Свернуть' : '▼ Добавить заметку'}
   </button>
 </div>
+
         <div style={{ maxHeight: isFormOpen ? '1000px' : '0', overflow: 'hidden', transition: 'all 0.3s', opacity: isFormOpen ? 1 : 0 }}>
           <AddNoteForm onAdd={handleAddNote} allTags={allTags} locationTags={locationTags} onRequestNewLocation={handleRequestNewLocation} autoAddTag={autoAddTag} onAutoAddHandled={handleAutoAddHandled} />
         </div>
