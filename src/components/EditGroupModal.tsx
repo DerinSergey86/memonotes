@@ -8,10 +8,11 @@ interface EditGroupModalProps {
   group: Group;
   onSave: (updatedGroup: Group) => void;
   onClose: () => void;
+  onDelete: (id: string) => void;   // ← новый пропс
   allTags: string[];
 }
 
-export default function EditGroupModal({ group, onSave, onClose, allTags }: EditGroupModalProps) {
+export default function EditGroupModal({ group, onSave, onClose, onDelete, allTags }: EditGroupModalProps) {
   const [name, setName] = useState(group.name);
   const [relatedTags, setRelatedTags] = useState<string[]>(
     group.tags.slice(1)
@@ -88,7 +89,6 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
             />
           </div>
 
-          {/* Связанные теги — как в заметках */}
           <div style={{ marginBottom: '12px' }}>
             <label>Связанные теги:</label>
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '4px', marginTop: '4px' }}>
@@ -143,7 +143,7 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
                 type="button"
                 onClick={handleAddTag}
                 className="btn"
-                style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}
+                style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}
               >
                 Добавить
               </button>
@@ -187,32 +187,34 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
             )}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', marginTop: '12px' }}>
             {group.id && (
-  <button
-    type="button"
-    onClick={() => { if (window.confirm('Удалить группу?')) { /* здесь нужен колбэк onDelete */ } }}
-    className="btn"
-    style={{ border: '1px solid #d32f2f', background: '#fff', color: '#d32f2f', marginRight: 'auto' }}
-  >
-    Удалить
-  </button>
-)}
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn"
-              style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}
-            >
-              Отмена
-            </button>
-            <button
-              type="submit"
-              className="btn"
-              style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}
-            >
-              Сохранить
-            </button>
+              <button
+                type="button"
+                onClick={() => { if (window.confirm('Удалить группу?')) { onDelete(group.id); onClose(); } }}
+                className="btn"
+                style={{ border: '1px solid #d32f2f', background: '#fff', color: '#d32f2f' }}
+              >
+                Удалить
+              </button>
+            )}
+            <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn"
+                style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}
+              >
+                Отмена
+              </button>
+              <button
+                type="submit"
+                className="btn"
+                style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}
+              >
+                Сохранить
+              </button>
+            </div>
           </div>
         </form>
       </div>

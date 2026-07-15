@@ -40,7 +40,7 @@ export default function App() {
   const [focusedGroupId, setFocusedGroupId] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [remindersEnabled, setRemindersEnabled] = useState(false);
-useTaskReminders(notes, true);
+  useTaskReminders(notes, true);
 
   const [groups, setGroups] = useState<Group[]>([
     { id: '1', name: 'Семья', image: '/images/family.png', tags: ['семья'] },
@@ -68,6 +68,10 @@ useTaskReminders(notes, true);
   }, [groups, allTags]);
 
   const allGroups = useMemo(() => [...groups, ungroupedGroup, noTagsGroup], [groups, ungroupedGroup, noTagsGroup]);
+
+  const handleDeleteGroup = (id: string) => {
+  setGroups(prev => prev.filter(g => g.id !== id));
+};
 
   const handleGroupClick = (group: Group) => {
     if (group.id === 'no-tags') {
@@ -406,7 +410,7 @@ useTaskReminders(notes, true);
           <AddressFormModal initial={editingAddress} onSave={handleSaveAddress} onClose={() => setEditingAddress(undefined)} onDelete={handleDeleteAddress} />
         )}
         {editingGroup && (
-          <EditGroupModal group={editingGroup} onSave={handleSaveGroup} onClose={() => setEditingGroup(null)} allTags={allTags} />
+          <EditGroupModal group={editingGroup} onSave={handleSaveGroup} onClose={() => setEditingGroup(null)} onDelete={handleDeleteGroup} allTags={allTags} />
         )}
       </div>
     </div>
