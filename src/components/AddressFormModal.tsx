@@ -208,17 +208,33 @@ export default function AddressFormModal({ onSave, onClose, onDelete, initial }:
               </div>
             )}
           </div>
-          <button type="button" onClick={async () => {
-            setGettingCoords(true);
-            try {
-              const coords = await getPosition();
-              setLatitude(coords.latitude);
-              setLongitude(coords.longitude);
-            } catch { setLocalError('Не удалось получить координаты'); }
-            finally { setGettingCoords(false); }
-          }} disabled={gettingCoords} style={{ marginBottom: '12px', padding: '4px 8px' }}>
-            {gettingCoords ? 'Поиск...' : '📍 Определить местоположение'}
-          </button>
+          <button
+  type="button"
+  onClick={async () => {
+    setGettingCoords(true);
+    try {
+      // Устанавливаем таймаут на 10 секунд, чтобы избежать зависаний
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), 10000)
+      );
+      const coords = await Promise.race([getPosition(), timeoutPromise]);
+      setLatitude(coords.latitude);
+      setLongitude(coords.longitude);
+      setLocalError('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Неизвестная ошибка';
+      setLocalError(`Не удалось получить координаты: ${message}`);
+      // Важно: НЕ делаем ничего, что может вызвать переход
+    } finally {
+      setGettingCoords(false);
+    }
+  }}
+  disabled={gettingCoords}
+  className="btn"
+  style={{ marginBottom: '12px', background: '#f0f0f0', border: '1px solid #ccc' }}
+>
+  {gettingCoords ? 'Поиск...' : '📍 Определить местоположение'}
+</button>
           <div style={{ marginBottom: '12px' }}>
             <label>Выберите точку на карте:</label>
             <LocationPickerMap

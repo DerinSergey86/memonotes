@@ -16,11 +16,15 @@ export function useGeofencing({ locationTags, notes, enabled }: UseGeofencingPro
   const [notifiedTags, setNotifiedTags] = useState<Set<string>>(new Set());
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const showNotification = (title: string, body: string) => {
-    if (Notification.permission === 'granted') {
+const showNotification = (title: string, body: string) => {
+  if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+    try {
       new Notification(title, { body, icon: '/icons/icon-192x192.png' });
+    } catch (e) {
+      console.error('Notification failed:', e);
     }
-  };
+  }
+};
 
   const checkGeofences = useCallback(() => {
     if (!latitude || !longitude || !enabled) return;

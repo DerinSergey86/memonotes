@@ -179,11 +179,15 @@ export default function App() {
     setActiveTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
   };
 
-  const handleAddressClick = (id: string) => {
-    setLocationTagFilter(prev => prev === id ? null : id);
-  };
+const handleAddressClick = (id: string) => {
+  console.log('handleAddressClick called', id);
+  setLocationTagFilter(prev => prev === id ? null : id);
+};
 
-  const handleEditAddress = (tag: LocationTag) => setEditingAddress(tag);
+const handleEditAddress = (tag: LocationTag) => {
+  console.log('handleEditAddress called', tag);
+  setEditingAddress(tag);
+};
   const handleAddAddress = () => setEditingAddress(null);
 
   const handleAddNote = async (newNote: Note) => {
@@ -248,14 +252,26 @@ export default function App() {
 
   const handleAutoAddHandled = () => setAutoAddTag(null);
 
-  const handleGeoClick = () => {
-    if (!geoEnabled) {
-      Notification.requestPermission().then(perm => {
-        if (perm === 'granted') { setGeoEnabled(true); startWatching(); }
-        else alert('Разрешите уведомления, чтобы геозоны работали');
-      });
-    } else { setGeoEnabled(false); stopWatching(); }
-  };
+const handleGeoClick = async () => {
+  if (!geoEnabled) {
+    // Запрашиваем разрешение, если его ещё нет
+    if (Notification.permission === 'default') {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        alert('Разрешите уведомления, чтобы геозоны работали');
+        return;
+      }
+    } else if (Notification.permission === 'denied') {
+      alert('Уведомления заблокированы. Разблокируйте их в настройках браузера.');
+      return;
+    }
+    setGeoEnabled(true);
+    startWatching();
+  } else {
+    setGeoEnabled(false);
+    stopWatching();
+  }
+};
 
   const focusedGroupTags = useMemo(() => {
     if (focusedGroupId === 'ungrouped') return ungroupedGroup.tags;
