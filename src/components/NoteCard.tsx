@@ -143,7 +143,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
         )}
 
         <div style={{ marginTop: '8px' }}>
-          <button onClick={handleStartEditing} className="btn" style={{ marginRight: '8px', border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+          <button onClick={handleStartEditing} className="btn" style={{ marginRight: '8px', border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
             Редактировать
           </button>
           <button onClick={() => {
@@ -228,7 +228,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
               <option key={tag} value={tag} />
             ))}
           </datalist>
-          <button type="button" onClick={handleAddEditTag} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+          <button type="button" onClick={handleAddEditTag} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
             Добавить
           </button>
         </div>
@@ -255,7 +255,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
               <datalist id="edit-enter-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={() => addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput)} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+              <button type="button" onClick={() => addLocationTag(enterInput, editEnterLocationTagIds, setEditEnterLocationTagIds, setEnterInput)} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
                 Добавить
               </button>
             </div>
@@ -279,7 +279,7 @@ function NoteCard({ note, onDelete, onUpdate, onTagClick, locationTags, allTags 
               <datalist id="edit-exit-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-              <button type="button" onClick={() => addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput)} className="btn" style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}>
+              <button type="button" onClick={() => addLocationTag(exitInput, editExitLocationTagIds, setEditExitLocationTagIds, setExitInput)} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
                 Добавить
               </button>
             </div>

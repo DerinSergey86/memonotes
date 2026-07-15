@@ -342,8 +342,8 @@ useTaskReminders(notes, true);
     ＋
   </button>
   <button onClick={handleGeoClick} className="btn-geo" style={{ borderRadius: '20px', border: '1px solid #859c5e', background: geoEnabled ? '#859c5e' : '#f0f0f0', color: geoEnabled ? 'white' : '#333', cursor: 'pointer' }}>
-    <span className="btn-geo__text">{geoEnabled ? '📍 Вкл' : '📍 Выкл'}</span>
-    <span className="btn-geo__icon">{geoEnabled ? '🟢' : '🔴'}</span>
+    <span className="btn-geo__text">{geoEnabled ? '📍 Геозоны вкл' : '📍 Геозоны выкл'}</span>
+    <span className="btn-geo__icon">{geoEnabled ? '🟢Гео' : '🔴Гео'}</span>
   </button>
 </div>
 

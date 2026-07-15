@@ -168,7 +168,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
               <option key={tag} value={tag} />
             ))}
           </datalist>
-<button type="button" onClick={handleAddTag} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0' }}>
+<button type="button" onClick={handleAddTag} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
   Добавить
 </button>
         </div>
@@ -215,7 +215,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
               <datalist id="enter-tags-list">
                 {locationTags.map(tag => <option key={tag.id} value={tag.name} />)}
               </datalist>
-<button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0' }}>
+<button type="button" onClick={() => addLocationTag(enterInput, enterLocationTagIds, setEnterLocationTagIds, setEnterInput, 'enter')} className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
   Добавить
 </button>
             </div>
@@ -253,7 +253,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
   type="button"
   onClick={() => addLocationTag(exitInput, exitLocationTagIds, setExitLocationTagIds, setExitInput, 'exit')}
   className="btn"
-  style={{ border: '1px solid #ccc', background: '#f0f0f0' }}
+  style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}
 >
   Добавить
 </button>
@@ -263,7 +263,7 @@ function AddNoteForm({ onAdd, allTags, locationTags, onRequestNewLocation, autoA
       )}
 
       <div style={{ textAlign: 'center', marginTop: '8px' }}>
-<button type="submit" className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0' }}>
+<button type="submit" className="btn" style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}>
   Добавить заметку
 </button>
       </div>

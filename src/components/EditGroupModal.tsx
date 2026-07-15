@@ -83,11 +83,12 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
+              className="form-input"
               style={{ width: '100%', marginTop: '4px' }}
             />
           </div>
 
-          {/* Связанные теги */}
+          {/* Связанные теги — как в заметках */}
           <div style={{ marginBottom: '12px' }}>
             <label>Связанные теги:</label>
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '4px', marginTop: '4px' }}>
@@ -130,7 +131,8 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
                   }
                 }}
                 list="group-related-tags-list"
-                style={{ flex: 1, borderRadius: '8px', border: 'solid 1px' }}
+                className="form-input"
+                style={{ flex: 1 }}
               />
               <datalist id="group-related-tags-list">
                 {allTags.map(tag => (
@@ -140,7 +142,8 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
               <button
                 type="button"
                 onClick={handleAddTag}
-                style={{ padding: '4px 8px', borderRadius: '8px', border: 'solid 1px' }}
+                className="btn"
+                style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}
               >
                 Добавить
               </button>
@@ -153,6 +156,7 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
               type="text"
               value={image}
               onChange={e => setImage(e.target.value)}
+              className="form-input"
               style={{ width: '100%', marginTop: '4px' }}
               placeholder="URL"
             />
@@ -164,8 +168,8 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
             />
             {image && (
               <div style={{
-                width: '360px',
-                height: '360px',
+                width: '120px',
+                height: '120px',
                 borderRadius: '4px',
                 overflow: 'hidden',
                 marginTop: '8px'
@@ -184,27 +188,28 @@ export default function EditGroupModal({ group, onSave, onClose, allTags }: Edit
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            {group.id && (
+  <button
+    type="button"
+    onClick={() => { if (window.confirm('Удалить группу?')) { /* здесь нужен колбэк onDelete */ } }}
+    className="btn"
+    style={{ border: '1px solid #d32f2f', background: '#fff', color: '#d32f2f', marginRight: 'auto' }}
+  >
+    Удалить
+  </button>
+)}
             <button
               type="button"
               onClick={onClose}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '4px',
-                border: '1px solid #ccc',
-                background: '#fff'
-              }}
+              className="btn"
+              style={{ border: '1px solid #ccc', background: '#f0f0f0', color: '#333' }}
             >
               Отмена
             </button>
             <button
               type="submit"
-              style={{
-                padding: '6px 14px',
-                borderRadius: '4px',
-                background: '#859c5e',
-                color: 'white',
-                border: 'none'
-              }}
+              className="btn"
+              style={{ border: '1px solid #859c5e', background: '#859c5e', color: 'white' }}
             >
               Сохранить
             </button>
