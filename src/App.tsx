@@ -267,6 +267,9 @@ const handleGeoClick = async () => {
     }
     setGeoEnabled(true);
     startWatching();
+    if (Notification.permission === 'granted') {
+  new Notification('Тест', { body: 'Геозоны активированы', icon: '/icons/icon-192x192.png' });
+}
   } else {
     setGeoEnabled(false);
     stopWatching();
