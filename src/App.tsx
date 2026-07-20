@@ -27,7 +27,12 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [locationTags, setLocationTags] = useState<LocationTag[]>([]);
   const [editingAddress, setEditingAddress] = useState<LocationTag | null | undefined>(undefined);
-  const [geoEnabled, setGeoEnabled] = useState(false);
+ const [geoEnabled, setGeoEnabled] = useState(() => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('geoEnabled') === 'true';
+  }
+  return false;
+});
   const [showAddresses, setShowAddresses] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTags, setActiveTags] = useState<string[]>([]);
@@ -115,6 +120,10 @@ export default function App() {
     }
     setEditingGroup(null);
   };
+
+  useEffect(() => {
+  localStorage.setItem('geoEnabled', geoEnabled.toString());
+}, [geoEnabled]);
 
   useEffect(() => {
     fetch('/api/notes')
@@ -254,18 +263,37 @@ const handleEditAddress = (tag: LocationTag) => {
 
 const handleGeoClick = async () => {
   if (!geoEnabled) {
-    let permission = Notification.permission;
-    if (permission === 'default') {
-      permission = await Notification.requestPermission();
+    // 1. Запрашиваем разрешение на уведомления
+    let notifPerm = Notification.permission;
+    if (notifPerm === 'default') {
+      notifPerm = await Notification.requestPermission();
     }
-    if (permission !== 'granted') {
-      alert('Уведомления необходимы для работы геозон. Разрешите их в настройках браузера.');
+    if (notifPerm !== 'granted') {
+      alert('Для геозон нужны уведомления. Разрешите их в настройках браузера.');
       return;
     }
+
+    // 2. Явно запрашиваем геолокацию (даже если разрешение уже есть, это «разбудит» API)
+    try {
+      await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+      });
+    } catch (geoErr) {
+      alert('Не удалось получить местоположение. Проверьте настройки геолокации.');
+      return;
+    }
+
+    // 3. Включаем геозоны
     setGeoEnabled(true);
     startWatching();
-    // Тестовое уведомление
-    new Notification('Геозоны активированы', { body: 'Вы будете получать уведомления при входе/выходе', icon: '/icons/icon-192x192.png' });
+
+    // 4. Тестовое уведомление
+    if (Notification.permission === 'granted') {
+      new Notification('Геозоны активированы', {
+        body: 'Вы будете получать уведомления при входе/выходе',
+        icon: '/icons/icon-192x192.png',
+      });
+    }
   } else {
     setGeoEnabled(false);
     stopWatching();
