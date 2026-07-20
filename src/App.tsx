@@ -254,22 +254,18 @@ const handleEditAddress = (tag: LocationTag) => {
 
 const handleGeoClick = async () => {
   if (!geoEnabled) {
-    // Запрашиваем разрешение, если его ещё нет
-    if (Notification.permission === 'default') {
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') {
-        alert('Разрешите уведомления, чтобы геозоны работали');
-        return;
-      }
-    } else if (Notification.permission === 'denied') {
-      alert('Уведомления заблокированы. Разблокируйте их в настройках браузера.');
+    let permission = Notification.permission;
+    if (permission === 'default') {
+      permission = await Notification.requestPermission();
+    }
+    if (permission !== 'granted') {
+      alert('Уведомления необходимы для работы геозон. Разрешите их в настройках браузера.');
       return;
     }
     setGeoEnabled(true);
     startWatching();
-    if (Notification.permission === 'granted') {
-  new Notification('Тест', { body: 'Геозоны активированы', icon: '/icons/icon-192x192.png' });
-}
+    // Тестовое уведомление
+    new Notification('Геозоны активированы', { body: 'Вы будете получать уведомления при входе/выходе', icon: '/icons/icon-192x192.png' });
   } else {
     setGeoEnabled(false);
     stopWatching();
