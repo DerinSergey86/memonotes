@@ -16,34 +16,41 @@ export function useGeofencing({ locationTags, notes, enabled }: UseGeofencingPro
   const [notifiedTags, setNotifiedTags] = useState<Set<string>>(new Set());
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-const showNotification = (title: string, body: string) => {
-  if (typeof window !== 'undefined' && Notification.permission === 'granted') {
-    try {
-      new Notification(title, { body, icon: '/icons/icon-192x192.png' });
-    } catch (e) {
-      console.error('Notification failed:', e);
+  const showNotification = (title: string, body: string) => {
+    console.log('Попытка отправить уведомление:', title, body);
+    if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        new Notification(title, { body, icon: '/icons/icon-192x192.png' });
+        console.log('Уведомление отправлено');
+      } catch (e) {
+        console.error('Ошибка отправки уведомления:', e);
+      }
+    } else {
+      console.warn('Нет разрешения на уведомления');
     }
-  }
-};
+  };
 
   const checkGeofences = useCallback(() => {
+    console.log('Проверка геозон. Координаты:', latitude, longitude, 'enabled:', enabled);
     if (!latitude || !longitude || !enabled) return;
 
     locationTags.forEach(tag => {
-      if (!tag.latitude || !tag.longitude || !tag.radius || !tag.enabled) return;
+      if (!tag.latitude || !tag.longitude || !tag.radius) return;
 
       const distance = getDistanceFromLatLngInMeters(latitude, longitude, tag.latitude, tag.longitude);
       const inside = distance <= tag.radius;
-      const alreadyNotified = notifiedTags.has(tag.id);
+      console.log(`Зона "${tag.name}": расстояние ${distance.toFixed(1)}м, внутри: ${inside}`);
 
       const hasActiveTasks = notes.some(note =>
         note.type === 'task' && !note.completed &&
         ((inside && note.enterLocationTagIds?.includes(tag.id)) ||
          (!inside && note.exitLocationTagIds?.includes(tag.id)))
       );
+      console.log(`Активные задачи для входа/выхода: ${hasActiveTasks}`);
 
       if (!hasActiveTasks) return;
 
+      const alreadyNotified = notifiedTags.has(tag.id);
       if (inside && !alreadyNotified) {
         showNotification(`📍 Вы вошли в зону "${tag.name}"`, `Есть активные задачи`);
         setNotifiedTags(prev => new Set(prev).add(tag.id));
@@ -64,6 +71,7 @@ const showNotification = (title: string, body: string) => {
       return;
     }
     getPosition();
+    console.log('Запущен интервал проверки геозон');
     intervalRef.current = setInterval(() => {
       getPosition();
       setTimeout(checkGeofences, 1000);
@@ -74,7 +82,10 @@ const showNotification = (title: string, body: string) => {
   }, [enabled, getPosition, checkGeofences]);
 
   useEffect(() => {
-    if (latitude && longitude) checkGeofences();
+    if (latitude && longitude) {
+      console.log('Координаты обновлены, проверяем геозоны');
+      checkGeofences();
+    }
   }, [latitude, longitude, checkGeofences]);
 
   return {
