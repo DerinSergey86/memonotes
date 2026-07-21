@@ -1,3 +1,4 @@
+ 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
@@ -16,6 +17,7 @@ import { useGeofencing } from '@/hooks/useGeofencing';
 import TagFilter from '@/components/TagFilter';
 import { useAllTags } from '@/hooks/useAllTags';
 import { useTaskReminders } from '@/hooks/useTaskReminders';
+import { Geolocation } from '@capacitor/geolocation';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 export default function App() {
@@ -125,6 +127,18 @@ export default function App() {
   useEffect(() => {
   localStorage.setItem('geoEnabled', geoEnabled.toString());
 }, [geoEnabled]);
+
+useEffect(() => {
+  // Создаём канал уведомлений, обязательный для Android 8+
+  LocalNotifications.createChannel({
+    id: 'default',
+    name: 'MemoNotes',
+    description: 'Основные уведомления',
+    importance: 5,       // максимальная важность (показывать даже на заблокированном экране)
+    visibility: 1,       // публичные уведомления
+    sound: 'default',
+  }).catch(err => console.warn('Ошибка создания канала:', err));
+}, []);
 
   useEffect(() => {
     fetch('/api/notes')
@@ -262,44 +276,46 @@ const handleEditAddress = (tag: LocationTag) => {
 
   const handleAutoAddHandled = () => setAutoAddTag(null);
 
+
 const handleGeoClick = async () => {
   if (!geoEnabled) {
     try {
-      // Запрашиваем разрешение на уведомления через Capacitor
-      const perm = await LocalNotifications.requestPermissions();
-      if (perm.display !== 'granted') {
-        alert('Для геозон нужны уведомления. Разрешите их в настройках приложения.');
+      // 1. Проверяем и запрашиваем разрешение геолокации
+      const perm = await Geolocation.checkPermissions();
+      if (perm.location !== 'granted') {
+        const req = await Geolocation.requestPermissions();
+        if (req.location !== 'granted') {
+          alert('Необходимо разрешить доступ к местоположению. Пожалуйста, откройте настройки приложения и включите геолокацию.');
+          return;
+        }
+      }
+
+      // 2. Проверяем, что GPS действительно работает
+      try {
+        await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
+      } catch (posError) {
+        alert('Не удалось определить местоположение. Убедитесь, что GPS включён.');
         return;
       }
+
+      // 3. Запрашиваем уведомления (оставляем как было)
+      try {
+        const notifPerm = await LocalNotifications.requestPermissions();
+        if (notifPerm.display !== 'granted') {
+          alert('Для геозон нужны уведомления. Разрешите их в настройках приложения.');
+          return;
+        }
+      } catch (e) {
+        console.error('Ошибка запроса уведомлений:', e);
+      }
+
+      // 4. Включаем геозоны
+      setGeoEnabled(true);
+      startWatching();
+
     } catch (e) {
-      console.error('Ошибка запроса разрешений:', e);
-    }
-
-    // Запрашиваем геолокацию
-    try {
-      await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
-      });
-    } catch (geoErr) {
-      alert('Не удалось получить местоположение. Проверьте настройки геолокации.');
-      return;
-    }
-
-    setGeoEnabled(true);
-    startWatching();
-
-    // Тестовое уведомление через Capacitor
-    try {
-      await LocalNotifications.schedule({
-        notifications: [{
-          title: 'Геозоны активированы',
-          body: 'Вы будете получать уведомления при входе/выходе',
-          id: Date.now(),
-          schedule: { at: new Date() },
-        }],
-      });
-    } catch (e) {
-      console.error('Ошибка тестового уведомления:', e);
+      console.error('Общая ошибка геозон:', e);
+      alert('Не удалось запустить геозоны. Попробуйте позже.');
     }
   } else {
     setGeoEnabled(false);
