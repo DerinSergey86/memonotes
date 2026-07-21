@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { type Note } from '@/types';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
-const INTERVALS_MINUTES = [1440, 2880, 4320]; // 1 день, 2 дня, затем каждые 3 дня
+const INTERVALS_MINUTES = [1440, 2880, 4320];
 
 interface StoredData {
   lastIndex: number;
@@ -36,17 +36,17 @@ export function useTaskReminders(notes: Note[], enabled: boolean) {
   const [stored, setStored] = useState<StoredData>({ lastIndex: -1, lastTimestamp: 0 });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Безопасно читаем localStorage при монтировании
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStored(getStoredData());
   }, []);
 
   const activeTaskCount = notes.filter(n => n.type === 'task' && !n.completed).length;
 
-  // Сброс, если задач не осталось
   useEffect(() => {
     if (activeTaskCount === 0 && stored.lastIndex >= 0) {
       const reset: StoredData = { lastIndex: -1, lastTimestamp: 0 };
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStored(reset);
       storeData(reset);
     }
@@ -64,24 +64,29 @@ export function useTaskReminders(notes: Note[], enabled: boolean) {
     const timeSinceLast = now - stored.lastTimestamp;
     const delay = stored.lastTimestamp === 0 ? 0 : Math.max(intervalMs - timeSinceLast, 0);
 
-    const timeout = setTimeout(() => {
-      if (typeof window !== 'undefined' && Notification.permission === 'granted') {
-        const tasksLeft = notes.filter(n => n.type === 'task' && !n.completed).length;
-        try {
-          new Notification('Здравствуйте!', {
+    const timeout = setTimeout(async () => {
+      const tasksLeft = notes.filter(n => n.type === 'task' && !n.completed).length;
+      try {
+        await LocalNotifications.schedule({
+          notifications: [{
+            title: 'Здравствуйте!',
             body: `У вас ${tasksLeft} невыполненных задач.`,
-            icon: '/icons/icon-192x192.png',
-          });
-        } catch {}
+            id: Date.now(),
+            schedule: { at: new Date() },
+          }],
+        });
+      } catch (e) {
+        console.error('Ошибка отправки напоминания:', e);
       }
       const updated: StoredData = { lastIndex: nextIndex, lastTimestamp: Date.now() };
+       
       setStored(updated);
       storeData(updated);
     }, delay);
 
     intervalRef.current = timeout;
     return () => {
-      if (intervalRef.current) clearTimeout(intervalRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [enabled, activeTaskCount, stored, notes]);
 }

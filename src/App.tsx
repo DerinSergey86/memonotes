@@ -16,6 +16,7 @@ import { useGeofencing } from '@/hooks/useGeofencing';
 import TagFilter from '@/components/TagFilter';
 import { useAllTags } from '@/hooks/useAllTags';
 import { useTaskReminders } from '@/hooks/useTaskReminders';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 export default function App() {
   const mounted = useMounted();
@@ -263,17 +264,18 @@ const handleEditAddress = (tag: LocationTag) => {
 
 const handleGeoClick = async () => {
   if (!geoEnabled) {
-    // 1. Запрашиваем разрешение на уведомления
-    let notifPerm = Notification.permission;
-    if (notifPerm === 'default') {
-      notifPerm = await Notification.requestPermission();
-    }
-    if (notifPerm !== 'granted') {
-      alert('Для геозон нужны уведомления. Разрешите их в настройках браузера.');
-      return;
+    try {
+      // Запрашиваем разрешение на уведомления через Capacitor
+      const perm = await LocalNotifications.requestPermissions();
+      if (perm.display !== 'granted') {
+        alert('Для геозон нужны уведомления. Разрешите их в настройках приложения.');
+        return;
+      }
+    } catch (e) {
+      console.error('Ошибка запроса разрешений:', e);
     }
 
-    // 2. Явно запрашиваем геолокацию (даже если разрешение уже есть, это «разбудит» API)
+    // Запрашиваем геолокацию
     try {
       await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
@@ -283,16 +285,21 @@ const handleGeoClick = async () => {
       return;
     }
 
-    // 3. Включаем геозоны
     setGeoEnabled(true);
     startWatching();
 
-    // 4. Тестовое уведомление
-    if (Notification.permission === 'granted') {
-      new Notification('Геозоны активированы', {
-        body: 'Вы будете получать уведомления при входе/выходе',
-        icon: '/icons/icon-192x192.png',
+    // Тестовое уведомление через Capacitor
+    try {
+      await LocalNotifications.schedule({
+        notifications: [{
+          title: 'Геозоны активированы',
+          body: 'Вы будете получать уведомления при входе/выходе',
+          id: Date.now(),
+          schedule: { at: new Date() },
+        }],
       });
+    } catch (e) {
+      console.error('Ошибка тестового уведомления:', e);
     }
   } else {
     setGeoEnabled(false);
