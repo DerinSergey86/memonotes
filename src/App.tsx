@@ -48,7 +48,7 @@ export default function App() {
   const [focusedGroupId, setFocusedGroupId] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [remindersEnabled, setRemindersEnabled] = useState(false);
-  useTaskReminders(notes, true);
+  //useTaskReminders(notes, true);
 
   const [groups, setGroups] = useState<Group[]>([
     { id: '1', name: 'Семья', image: '/images/family.png', tags: ['семья'] },
@@ -65,7 +65,7 @@ export default function App() {
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 
   const allTags = useAllTags(notes, groups);
-  const { startWatching, stopWatching } = useGeofencing({ locationTags, notes, enabled: geoEnabled });
+  //const { startWatching, stopWatching } = useGeofencing({ locationTags, notes, enabled: geoEnabled });
 
   const noTagsGroup = useMemo<Group>(() => ({ id: 'no-tags', name: 'Без тегов', image: '/images/no-tags.png', tags: [] }), []);
   const ungroupedGroup = useMemo<Group>(() => {
@@ -280,7 +280,6 @@ const handleEditAddress = (tag: LocationTag) => {
 const handleGeoClick = async () => {
   if (!geoEnabled) {
     try {
-      // 1. Проверяем и запрашиваем разрешение геолокации
       const perm = await Geolocation.checkPermissions();
       if (perm.location !== 'granted') {
         const req = await Geolocation.requestPermissions();
@@ -290,7 +289,6 @@ const handleGeoClick = async () => {
         }
       }
 
-      // 2. Проверяем, что GPS действительно работает
       try {
         await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 });
       } catch (posError) {
@@ -298,7 +296,6 @@ const handleGeoClick = async () => {
         return;
       }
 
-      // 3. Запрашиваем уведомления (оставляем как было)
       try {
         const notifPerm = await LocalNotifications.requestPermissions();
         if (notifPerm.display !== 'granted') {
@@ -309,17 +306,15 @@ const handleGeoClick = async () => {
         console.error('Ошибка запроса уведомлений:', e);
       }
 
-      // 4. Включаем геозоны
+      // Просто включаем состояние без вызова startWatching
       setGeoEnabled(true);
-      startWatching();
-
     } catch (e) {
       console.error('Общая ошибка геозон:', e);
       alert('Не удалось запустить геозоны. Попробуйте позже.');
     }
   } else {
     setGeoEnabled(false);
-    stopWatching();
+    // stopWatching() удалён
   }
 };
 
